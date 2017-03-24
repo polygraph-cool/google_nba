@@ -4,17 +4,29 @@
 	padding 1rem
 	
 	.year
-		padding-bottom 1rem
-	
+		margin-bottom 2rem
+		display flex
+
+	.year__label
+		width 4rem
+		
 	.year__plays
 		display flex
+		flex-grow 1
+		width auto
 	
 	.play 
 		width 2%
 		height 2rem
-		background-color red
 		border-right 1px solid white
+		opacity 0.6
 		cursor pointer
+		&.is-active
+			border 3px solid $off-black
+			opacity 1
+		&:hover
+			border 3px solid $off-black
+			opacity 1
 	
 	.chart__key
 		display flex

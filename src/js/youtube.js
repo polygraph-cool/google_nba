@@ -1,10 +1,11 @@
 import * as d3 from 'd3'
+import Graphic from './graphic'
 
 let ready = false
-let cued = false
-const players = {}
+const players = []
 const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
+let currentPlayerIndex = 0
 
 // gross global cuz youtube
 window.onYouTubeIframeAPIReady = () => {
@@ -20,34 +21,49 @@ function loadScript() {
 	firstScriptTag.parentNode.insertBefore(tag, firstScriptTag)
 }
 
-function onPlayerReady({ data, target }) {
-	console.log('ready')
+function onPlayerReady({ target }) {
+	// target.playVideo()
+}
+
+function pauseVideos() {
+	players.forEach((player, i) => {
+		if (i !== currentPlayerIndex) player.pauseVideo()
+	})
 }
 
 function onPlayerStateChange({ data, target }) {
-	// ended
+	// end of video, move on to next
 	if (data === 0) {
-		target.nbaIndex++
-		if (target.nbaIndex >= target.nbaPlaylist.length) target.nbaIndex = 0
-		jumpTo({ decade: target.nbaDecade, index: target.nbaIndex })
+		target.videoIndex++
+		if (target.videoIndex >= target.nbaPlaylist.length) target.videoIndex = 0
+		const params = {
+			playerIndex: target.playerIndex,
+			videoIndex: target.videoIndex,
+		}
+		jumpTo(params)
+		Graphic.jumpToPlay(params)
+	} else if (data === 1) {
+		currentPlayerIndex = target.playerIndex
+		pauseVideos()
+		resize()
 	}
 }
 
-function jumpTo({ decade, index }) {
-	const player = players[decade]
-	player.nbaIndex = index
-	player.loadVideoById(player.nbaPlaylist[index])
+function jumpTo({ playerIndex, videoIndex }) {
+	currentPlayerIndex = playerIndex
+	pauseVideos()
+
+	const player = players[playerIndex]
+	player.videoIndex = videoIndex
+	player.loadVideoById(player.nbaPlaylist[videoIndex])
+
+	resize()
 }
 
-function setup({ key, playlist }) {
-	const year = graphic.append('div')
-		.attr('class', 'video__year')
+function setupPlayer(d, i) {
+	const playlist = d.value.map(v => v.external_video_id)
 
-	year.append('p').text(`${key}s`)
-
-	year.append('div').attr('id', `player--${key}`)
-
-	const player = new YT.Player(`player--${key}`, {
+	const player = new YT.Player(`player--${i}`, {
 		videoId: playlist[0],
 		playerVars: {
 			controls: 0,
@@ -62,22 +78,44 @@ function setup({ key, playlist }) {
 		events: {
 			onReady: onPlayerReady,
 			onStateChange: onPlayerStateChange,
-		}
+		},
 	})
-	player.nbaIndex = 0
+
+	player.videoIndex = 0
 	player.nbaPlaylist = playlist
-	player.nbaDecade = key
-	players[key] = player
+	player.playerIndex = i
+	players.push(player)
 }
 
 function resize() {
-	const keys = Object.keys(players)
-	if (keys.length) {
-		const year = graphic.select('.video__year')
-		const width = year.node().offsetWidth
-		const height = Math.floor(width / RATIO)
-		keys.forEach(key => players[key].setSize(width, height))
+	// resize
+	graphic.selectAll('.video__year').classed('is-active', false)
+	graphic.select(`.video__year--${currentPlayerIndex}`).classed('is-active', true)
+
+	if (players.length) {
+		players.forEach((player, i) => {
+			const year = graphic.select(`.video__year--${i}`)
+			const width = year.node().offsetWidth
+			const height = Math.floor(width / RATIO)
+			player.setSize(width, height)
+		})
 	}
+}
+
+function setup(data) {
+	const year = graphic.selectAll('.year')
+		.data(data)
+	.enter().append('div')
+		.attr('class', (d, i) => `video__year video__year--${i}`)
+		.classed('is-active', d => d.key === '2010')
+
+	year.append('p').text(d => `${d.key}s`)
+
+	year.append('div').attr('id', (d, i) => `player--${i}`)
+
+	year.each(setupPlayer)
+
+	resize()
 }
 
 function init() {

@@ -1,9 +1,11 @@
 import * as d3 from 'd3'
 import 'promis'
+import './utils/find-index-polyfill'
 import Youtube from './youtube'
 
-let data
-let dataByDecade
+let data = null
+let dataByDecade = null
+let decades = null
 const graphic = d3.select('.graphic__chart')
 
 const categoryColors = {
@@ -15,6 +17,10 @@ const categoryColors = {
 	fight: '#ffff33',
 	injury: '#a65628',
 	untagged: '#ccc',
+}
+
+function decadeToIndex(decade) {
+	return decades.findIndex(d => d === decade)
 }
 
 function cleanData(row) {
@@ -29,6 +35,7 @@ function cleanData(row) {
 function rollupDecade(values) {
 	const sorted = values.sort((a, b) =>
 		d3.descending(a.estimated_view_count, b.estimated_view_count)
+		// d3.ascending(a.duration, b.duration)
 	)
 	return sorted.slice(0, 50)
 }
@@ -44,15 +51,34 @@ function loadData() {
 					.rollup(rollupDecade)
 					.entries(data)
 					.sort((a, b) => d3.descending(a.key, b.key))
+
+				// store data decades to map to array indices
+				decades = dataByDecade.map(d => d.key)
 				resolve()
 			}
 		})
 	})
 }
 
+function jumpToPlay({ playerIndex, videoIndex }) {
+	const year = graphic.selectAll('.year')
+		.filter((d, i) => i === playerIndex)
+
+	year.selectAll('.play')
+		.classed('is-active', false)
+		.filter((d, i) => i === videoIndex)
+			.classed('is-active', true)
+}
+
 function handlePlayClick(d, i) {
-	const { decade, external_video_id } = d
-	Youtube.jumpTo({ decade, index: i })
+	const playerIndex = decadeToIndex(d.decade)
+	Youtube.jumpTo({ playerIndex, videoIndex: i })
+
+	// deactive other plays
+	d3.select(this.parentNode).selectAll('.play')
+		.classed('is-active', false)
+
+	d3.select(this).classed('is-active', true)
 }
 
 function createChart() {
@@ -60,9 +86,6 @@ function createChart() {
 		.data(dataByDecade)
 		.enter().append('div')
 			.attr('class', 'year')
-
-	// set a local var so children can get year
-	// year.each((d, i, nodes) => yearLocal.set(nodes[i], d.key))
 
 	year.append('p')
 		.attr('class', 'year__label')
@@ -76,10 +99,15 @@ function createChart() {
 		.enter().append('div')
 
 	play.attr('class', 'play')
-		.style('background-color', d => {
+		.style('background-color', (d) => {
 			const cat = d.categories ? d.categories[0] : 'untagged'
 			return categoryColors[cat]
 		})
+		.style('color', (d) => {
+			const cat = d.categories ? d.categories[0] : 'untagged'
+			return categoryColors[cat]
+		})
+		.classed('is-active', (d, i) => i === 0)
 		.on('click', handlePlayClick)
 }
 
@@ -97,14 +125,10 @@ function createKey() {
 }
 
 function setup() {
-	dataByDecade.forEach((decade) => {
-		const playlist = decade.value.map(d => d.external_video_id)
-		const key = decade.key
-		Youtube.setup({ key, playlist })
-		Youtube.resize()
-	})
+	Youtube.setup(dataByDecade)
 	createChart()
 	createKey()
+	return Promise.resolve()
 }
 
 function resize() {
@@ -118,4 +142,4 @@ function init() {
 		.catch(err => console.log(err))
 }
 
-export default { init, resize }
+export default { init, resize, jumpToPlay }
