@@ -2,10 +2,26 @@ import * as d3 from 'd3'
 import Graphic from './graphic'
 
 let ready = false
+let initialAutoplay = false
 const players = []
 const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
 let currentPlayerIndex = 0
+
+function resize() {
+	// resize
+	graphic.selectAll('.video__year').classed('is-active', false)
+	graphic.select(`.video__year--${currentPlayerIndex}`).classed('is-active', true)
+
+	if (players.length) {
+		players.forEach((player, i) => {
+			const year = graphic.select(`.video__year--${i}`)
+			const width = year.node().offsetWidth
+			const height = Math.floor(width / RATIO)
+			player.setSize(width, height)
+		})
+	}
+}
 
 // gross global cuz youtube
 window.onYouTubeIframeAPIReady = () => {
@@ -22,13 +38,27 @@ function loadScript() {
 }
 
 function onPlayerReady({ target }) {
-	// target.playVideo()
+	if (!initialAutoplay && target.playerIndex === 0) {
+		initialAutoplay = true
+		target.playVideo()	
+	}
 }
 
 function pauseVideos() {
 	players.forEach((player, i) => {
 		if (i !== currentPlayerIndex) player.pauseVideo()
 	})
+}
+
+function jumpTo({ playerIndex, videoIndex }) {
+	currentPlayerIndex = playerIndex
+	pauseVideos()
+
+	const player = players[playerIndex]
+	player.videoIndex = videoIndex
+	player.loadVideoById(player.nbaPlaylist[videoIndex])
+
+	resize()
 }
 
 function onPlayerStateChange({ data, target }) {
@@ -49,29 +79,18 @@ function onPlayerStateChange({ data, target }) {
 	}
 }
 
-function jumpTo({ playerIndex, videoIndex }) {
-	currentPlayerIndex = playerIndex
-	pauseVideos()
-
-	const player = players[playerIndex]
-	player.videoIndex = videoIndex
-	player.loadVideoById(player.nbaPlaylist[videoIndex])
-
-	resize()
-}
-
 function setupPlayer(d, i) {
 	const playlist = d.value.map(v => v.external_video_id)
 
 	const player = new YT.Player(`player--${i}`, {
 		videoId: playlist[0],
 		playerVars: {
-			controls: 0,
+			controls: 1,
 			cc_load_policy: 0,
 			enablejsapi: 1,
 			fs: 0,
 			iv_load_policy: 3,
-			modestbranding: 1,
+			modestbranding: 0,
 			rel: 0,
 			showinfo: 0,
 		},
@@ -85,21 +104,6 @@ function setupPlayer(d, i) {
 	player.nbaPlaylist = playlist
 	player.playerIndex = i
 	players.push(player)
-}
-
-function resize() {
-	// resize
-	graphic.selectAll('.video__year').classed('is-active', false)
-	graphic.select(`.video__year--${currentPlayerIndex}`).classed('is-active', true)
-
-	if (players.length) {
-		players.forEach((player, i) => {
-			const year = graphic.select(`.video__year--${i}`)
-			const width = year.node().offsetWidth
-			const height = Math.floor(width / RATIO)
-			player.setSize(width, height)
-		})
-	}
 }
 
 function setup(data) {

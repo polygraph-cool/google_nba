@@ -6,7 +6,26 @@
 	.year
 		margin-bottom 2rem
 		display flex
+		position relative
 
+	.year:first-child
+		&:before
+			content '#1'
+			display block
+			position absolute
+			top 0
+			left 5rem
+			transform translateY(-120%)
+			font-size 0.75rem
+		&:after
+			content '#50'
+			display block
+			position absolute
+			top 0
+			right 0
+			transform translateY(-120%)
+			font-size 0.75rem
+			
 	.year__label
 		width 5rem
 		padding-right 0.5rem
@@ -20,7 +39,7 @@
 		display flex
 		flex-grow 1
 		width auto
-	
+		
 	.play 
 		width 2%
 		height 2rem
