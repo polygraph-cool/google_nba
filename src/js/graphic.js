@@ -41,9 +41,10 @@ function cleanData(row) {
 function rollupDecade(values) {
 	const sorted = values.sort((a, b) =>
 		d3.descending(a.estimated_view_count, b.estimated_view_count)
-		// d3.ascending(a.duration, b.duration)
 	)
-	return sorted.slice(0, NUM_VIDEOS)
+	return sorted
+		.slice(0, NUM_VIDEOS)
+		.map((d, i) => ({ ...d, index: i }))
 }
 
 function loadData() {
@@ -57,6 +58,11 @@ function loadData() {
 					.entries(data)
 					.sort((a, b) => d3.descending(a.key, b.key))
 
+				// TODO remove
+				dataByDecade.forEach(d => {
+					const ran = Math.floor(Math.random() * NUM_VIDEOS)
+					d.value[ran].annotation = 'random annotation for testing'
+				})
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -96,14 +102,14 @@ function handlePlayEnter(d, i) {
 
 	const views = formatViews(d.estimated_view_count)
 	const grandpa = d3.select(parent.parentNode)
-	grandpa.select('.annotation__text')
+	grandpa.select('.detail__text')
 		.text(`tk title here ${views} views`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 }
 
 function handlePlayExit(d) {
-	d3.select(this.parentNode).select('.annotation__text').text('')
+	d3.select(this.parentNode).select('.detail__text').text('')
 }
 
 function createChart() {
@@ -118,6 +124,9 @@ function createChart() {
 
 	const plays = year.append('div')
 		.attr('class', 'year__plays')
+
+	plays.append('div')
+		.attr('class', 'plays__annotation')
 
 	const items = plays.append('div')
 		.attr('class', 'plays__items')
@@ -140,12 +149,35 @@ function createChart() {
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
 
+	item.filter(d => d.annotation)
+		.each(function(d) {
+			const grandpa = d3.select(this.parentNode.parentNode)
+			const right = d.index > NUM_VIDEOS / 2
+			const percent = Math.floor(d.index / NUM_VIDEOS * 100) + 1
+			const off = right ? 100 - percent : percent
+			const before = right ? '&dtrif; ' : ''
+			const after = right ? '' : ' &dtrif;'
+			grandpa.select('.plays__annotation')
+				.append('p')
+					.html(`${before}${d.annotation}${after}`)
+					.style('margin-left', right ? 'auto' : `${off}%`)
+					.style('margin-right', right ? `${off}%` : 'auto')
+					.style('text-align', right ? 'right' : 'left')
+		})
+		// .append('p')
+		// .attr('class', 'item__annotation')
+		// .text(d => d.annotation)
+		// .style('text-align', d => {
+		// 	// return 'center'
+		// 	return d.index < NUM_VIDEOS / 2 ? 'left' : 'right'
+		// })
 
-	const annotation = plays.append('div')
-		.attr('class', 'plays__annotation')
 
-	annotation.append('p')
-		.attr('class', 'annotation__text')
+	const detail = plays.append('div')
+		.attr('class', 'plays__detail')
+
+	detail.append('p')
+		.attr('class', 'detail__text')
 		.text(d => {
 			const views = formatViews(d.value[0].estimated_view_count)
 			return `tk title here ${views} views`
