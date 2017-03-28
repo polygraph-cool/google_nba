@@ -7,40 +7,52 @@
 		margin-bottom 2rem
 		display flex
 		position relative
+		align-items center
 
 	.year:first-child
 		&:before
 			content '#1'
 			display block
 			position absolute
-			top 0
+			bottom 0
 			left 5rem
-			transform translateY(-120%)
+			transform translateY(120%)
 			font-size 0.75rem
 		&:after
 			content '#50'
 			display block
 			position absolute
-			top 0
+			bottom 0
 			right 0
-			transform translateY(-120%)
+			transform translateY(120%)
 			font-size 0.75rem
 			
 	.year__label
 		width 5rem
 		padding-right 0.5rem
 		font-size 0.8rem
-		line-height 2rem
+		line-height 1
 		text-transform capitalize
 		text-align right
 		font-weight bold
+		margin-top 1rem
 		
 	.year__plays
 		display flex
 		flex-grow 1
 		width auto
+		flex-wrap wrap
+	
+	.plays__annotation
+		width 100%
+		display block
 		
-	.play 
+	.plays__items
+		display flex
+		width 100%
+		// flex-grow 1
+		
+	.item 
 		width 2%
 		height 2rem
 		border-right 1px solid white
@@ -53,6 +65,15 @@
 			border 3px solid $off-black
 			opacity 1
 	
+	.plays__annotation
+		position relative
+		height 1rem
+	.annotation__text
+		position absolute
+		font-size 0.75rem
+		line-height 1
+		top 0
+		left 0
 	.chart__key
 		display flex
 		margin-top 2rem

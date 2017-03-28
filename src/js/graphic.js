@@ -6,6 +6,7 @@ import Youtube from './youtube'
 let dataByDecade = null
 let decades = null
 const graphic = d3.select('.graphic__chart')
+const NUM_VIDEOS = 50
 
 const categoryColors = {
 	dunk: '#e41a1c',
@@ -16,6 +17,10 @@ const categoryColors = {
 	fight: '#ffff33',
 	injury: '#a65628',
 	untagged: '#ccc',
+}
+
+function formatViews(num) {
+	return d3.format(',')(num)
 }
 
 function decadeToIndex(decade) {
@@ -38,7 +43,7 @@ function rollupDecade(values) {
 		d3.descending(a.estimated_view_count, b.estimated_view_count)
 		// d3.ascending(a.duration, b.duration)
 	)
-	return sorted.slice(0, 50)
+	return sorted.slice(0, NUM_VIDEOS)
 }
 
 function loadData() {
@@ -64,7 +69,7 @@ function jumpToPlay({ playerIndex, videoIndex }) {
 	const year = graphic.selectAll('.year')
 		.filter((d, i) => i === playerIndex)
 
-	year.selectAll('.play')
+	year.selectAll('.item')
 		.classed('is-active', false)
 		.filter((d, i) => i === videoIndex)
 			.classed('is-active', true)
@@ -75,10 +80,30 @@ function handlePlayClick(d, i) {
 	Youtube.jumpTo({ playerIndex, videoIndex: i })
 
 	// deactive other plays
-	d3.select(this.parentNode).selectAll('.play')
+	d3.select(this.parentNode).selectAll('.item')
 		.classed('is-active', false)
 
 	d3.select(this).classed('is-active', true)
+}
+
+function handlePlayEnter(d, i) {
+	const parent = this.parentNode
+	const parentW = parent.offsetWidth
+	const w = this.getBoundingClientRect().width
+	const right = i > NUM_VIDEOS / 2
+	let x = Math.floor(w * i)
+	if (right) x = parentW - x - w
+
+	const views = formatViews(d.estimated_view_count)
+	const grandpa = d3.select(parent.parentNode)
+	grandpa.select('.annotation__text')
+		.text(`tk title here ${views} views`)
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+}
+
+function handlePlayExit(d) {
+	d3.select(this.parentNode).select('.annotation__text').text('')
 }
 
 function createChart() {
@@ -94,11 +119,25 @@ function createChart() {
 	const plays = year.append('div')
 		.attr('class', 'year__plays')
 
-	const play = plays.selectAll('.plays')
+	const annotation = plays.append('div')
+		.attr('class', 'plays__annotation')
+
+	annotation.append('p')
+		.attr('class', 'annotation__text')
+		.text(d => {
+			const views = formatViews(d.value[0].estimated_view_count)
+			return `tk title here ${views} views`
+		})
+
+	const items = plays.append('div')
+		.attr('class', 'plays__items')
+		.on('mouseleave', handlePlayExit)
+
+	const item = items.selectAll('.item')
 		.data(d => d.value)
 		.enter().append('div')
 
-	play.attr('class', 'play')
+	item.attr('class', 'item')
 		.style('background-color', (d) => {
 			const cat = d.categories ? d.categories[0] : 'untagged'
 			return categoryColors[cat]
@@ -109,6 +148,7 @@ function createChart() {
 		})
 		.classed('is-active', (d, i) => i === 0)
 		.on('click', handlePlayClick)
+		.on('mouseenter', handlePlayEnter)
 }
 
 function createKey() {
