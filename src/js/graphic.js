@@ -119,16 +119,6 @@ function createChart() {
 	const plays = year.append('div')
 		.attr('class', 'year__plays')
 
-	const annotation = plays.append('div')
-		.attr('class', 'plays__annotation')
-
-	annotation.append('p')
-		.attr('class', 'annotation__text')
-		.text(d => {
-			const views = formatViews(d.value[0].estimated_view_count)
-			return `tk title here ${views} views`
-		})
-
 	const items = plays.append('div')
 		.attr('class', 'plays__items')
 		.on('mouseleave', handlePlayExit)
@@ -149,6 +139,17 @@ function createChart() {
 		.classed('is-active', (d, i) => i === 0)
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
+
+
+	const annotation = plays.append('div')
+		.attr('class', 'plays__annotation')
+
+	annotation.append('p')
+		.attr('class', 'annotation__text')
+		.text(d => {
+			const views = formatViews(d.value[0].estimated_view_count)
+			return `tk title here ${views} views`
+		})
 }
 
 function createKey() {
