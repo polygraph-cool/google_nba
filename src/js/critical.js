@@ -14,7 +14,11 @@ const ptSerif = [
 const roboto = [
 	{
 		family: 'Roboto',
-		weight: 400,
+		weight: 100,
+	},
+	{
+		family: 'Roboto',
+		weight: 300,
 	},
 	{
 		family: 'Roboto',

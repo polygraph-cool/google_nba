@@ -3,7 +3,6 @@ import 'promis'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 
-let data = null
 let dataByDecade = null
 let decades = null
 const graphic = d3.select('.graphic__chart')
@@ -24,11 +23,13 @@ function decadeToIndex(decade) {
 }
 
 function cleanData(row) {
+	// add in 2017 as its own decade
 	return {
 		...row,
 		estimated_view_count: +row.estimated_view_count,
 		duration: +row.duration,
 		categories: row.categories ? row.categories.split('|') : null,
+		decade_display: row.date.substring(0, 4) === '2017' ? 'this season' : `${row.decade}s`,
 	}
 }
 
@@ -42,12 +43,11 @@ function rollupDecade(values) {
 
 function loadData() {
 	return new Promise((resolve, reject) => {
-		d3.csv('assets/plays.csv', cleanData, (err, result) => {
+		d3.csv('assets/plays.csv', cleanData, (err, data) => {
 			if (err) reject(err)
 			else {
-				data = result
 				dataByDecade = d3.nest()
-					.key(d => d.decade)
+					.key(d => d.decade_display)
 					.rollup(rollupDecade)
 					.entries(data)
 					.sort((a, b) => d3.descending(a.key, b.key))
@@ -71,7 +71,7 @@ function jumpToPlay({ playerIndex, videoIndex }) {
 }
 
 function handlePlayClick(d, i) {
-	const playerIndex = decadeToIndex(d.decade)
+	const playerIndex = decadeToIndex(d.decade_display)
 	Youtube.jumpTo({ playerIndex, videoIndex: i })
 
 	// deactive other plays
@@ -89,7 +89,7 @@ function createChart() {
 
 	year.append('p')
 		.attr('class', 'year__label')
-		.text(d => `${d.key}s`)
+		.text(d => `${d.key}`)
 
 	const plays = year.append('div')
 		.attr('class', 'year__plays')

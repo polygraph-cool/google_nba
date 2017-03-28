@@ -109,7 +109,9 @@ function setup(data) {
 		.attr('class', (d, i) => `video__year video__year--${i}`)
 		.classed('is-active', d => d.key === '2010')
 
-	year.append('p').text(d => `${d.key}s`)
+	year.append('p')
+		.attr('class', 'year__label')
+		.text(d => `${d.key}`)
 
 	year.append('div').attr('id', (d, i) => `player--${i}`)
 
