@@ -167,14 +167,6 @@ function createChart() {
 
 	item.filter(d => d.annotation)
 		.each(createAnnotation)
-		// .append('p')
-		// .attr('class', 'item__annotation')
-		// .text(d => d.annotation)
-		// .style('text-align', d => {
-		// 	// return 'center'
-		// 	return d.index < NUM_VIDEOS / 2 ? 'left' : 'right'
-		// })
-
 
 	const detail = plays.append('div')
 		.attr('class', 'plays__detail')

@@ -23,9 +23,11 @@ curl -Lk http://bit.ly/2bgptna > Makefile; make;
 #### Development
 `gulp`
 
-Any changes to the **src** folder will trigger live reload.
+Any changes to the `src/	` folder will trigger live reload.
 
-Put JS in **src/js/entry.js** and CSS in **src/css/story/story.styl**.
+* **JS**: Put JS in `src/js/`, and take a look at `entry.js` and `graphic.js`, it has some basic skeleton stuff setup for you.
+* **CSS**: Put CSS in `src/css/story/`. You can put everything in `story.styl`, or create any new files you want in that directory wich are included automatically. Checkout `src/css/base/` for helper variables and functions.
+* **HTML**: Put HTML in `src/html/partials/story/`. Be sure to include your partials in `src/html/index.hbs`.
 
 #### Deploy
 Run `gulp dist`
@@ -45,6 +47,4 @@ To force cloudfront to fetch latest html file (replacing `id-here` with the clou
 *Note*: For cloudfront you must add [extra configuration](http://docs.aws.amazon.com/cli/latest/reference/cloudfront/create-invalidation.html)
 
 #### Fonts
-Our serif font is [Mercury](https://typography.com/fonts/mercury-text/styles/screensmart/) and our sans-serif is [Whitney](https://typography.com/fonts/whitney/styles/screensmart/). We have two weights, *400* and *700*, and normal and italic.
-
-It is recommended to use html markup (`em` and `strong`) to apply weighting and styling. The proper css is already applied.
+WIP
