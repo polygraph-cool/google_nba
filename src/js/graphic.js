@@ -20,7 +20,7 @@ const categoryColors = {
 }
 
 function formatViews(num) {
-	return d3.format(',')(num)
+	return d3.format('.2s')(num)
 }
 
 function decadeToIndex(decade) {
@@ -42,8 +42,9 @@ function rollupDecade(values) {
 	const sorted = values.sort((a, b) =>
 		d3.descending(a.estimated_view_count, b.estimated_view_count)
 	)
+	// TODO remove 1, + 1 slice, this is temp
 	return sorted
-		.slice(0, NUM_VIDEOS)
+		.slice(1, NUM_VIDEOS + 1)
 		.map((d, i) => ({ ...d, index: i }))
 }
 
