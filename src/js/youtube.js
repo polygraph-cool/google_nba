@@ -40,7 +40,8 @@ function loadScript() {
 function onPlayerReady({ target }) {
 	if (!initialAutoplay && target.playerIndex === 0) {
 		initialAutoplay = true
-		target.playVideo()	
+		target.playVideo()
+		Graphic.jumpToPlay({ playerIndex: 0, videoIndex: 0 })
 	}
 }
 
@@ -48,6 +49,12 @@ function pauseVideos() {
 	players.forEach((player, i) => {
 		if (i !== currentPlayerIndex) player.pauseVideo()
 	})
+}
+
+function updateTitle({ playerIndex, title }) {
+	graphic.selectAll('.label__title')
+		.filter((d, i) => i === playerIndex)
+		.text(title)
 }
 
 function jumpTo({ playerIndex, videoIndex }) {
@@ -116,6 +123,8 @@ function setup(data) {
 	year.append('p')
 		.attr('class', 'year__label')
 		.text(d => `${d.key}`)
+	.append('span')
+		.attr('class', 'label__title')
 
 	year.append('div').attr('id', (d, i) => `player--${i}`)
 
@@ -142,4 +151,4 @@ function init() {
 	})
 }
 
-export default { init, setup, resize, jumpTo }
+export default { init, setup, resize, jumpTo, updateTitle }

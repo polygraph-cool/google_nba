@@ -35,7 +35,6 @@
 		text-transform capitalize
 		text-align right
 		font-weight bold
-		margin-top -1rem
 		
 	.year__plays
 		display flex
@@ -66,10 +65,24 @@
 	
 	.plays__annotation
 		width 100%
-		p 
-			color $gray-dark
-			font-size 0.7rem
-		
+		position relative
+	.annotation__thumbnail
+		display none
+		width 20%
+		height 600%
+		position absolute
+		top 0
+		left 0
+		transform translateY(-83.3%)
+		z-index set-index('overlay')
+		background black
+		&.is-visible
+			display block		
+
+	.annotation__text
+		color $gray-dark
+		font-size 0.7rem
+	
 	.plays__detail
 		position relative
 	.detail__text

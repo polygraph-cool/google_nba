@@ -35,6 +35,7 @@ function cleanData(row) {
 		duration: +row.duration,
 		categories: row.categories ? row.categories.split('|') : null,
 		decade_display: row.date.substring(0, 4) === '2017' ? 'this season' : `${row.decade}s`,
+		title: 'Tk title here', // TODO
 	}
 }
 
@@ -80,11 +81,18 @@ function jumpToPlay({ playerIndex, videoIndex }) {
 		.classed('is-active', false)
 		.filter((d, i) => i === videoIndex)
 			.classed('is-active', true)
+
+	// update label
+	const d = dataByDecade[playerIndex].value[videoIndex]
+	Youtube.updateTitle({ playerIndex, title: `#${videoIndex + 1} ${d.title}` })
 }
 
 function handlePlayClick(d, i) {
 	const playerIndex = decadeToIndex(d.decade_display)
 	Youtube.jumpTo({ playerIndex, videoIndex: i })
+
+	// update label
+	Youtube.updateTitle({ playerIndex, title: `#${i + 1} ${d.title}` })
 
 	// deactive other plays
 	d3.select(this.parentNode).selectAll('.item')
@@ -104,13 +112,21 @@ function handlePlayEnter(d, i) {
 	const views = formatViews(d.estimated_view_count)
 	const grandpa = d3.select(parent.parentNode)
 	grandpa.select('.detail__text')
-		.text(`tk title here ${views} views`)
+		.text(`${d.title} ${views} views`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
+
+	grandpa.select('.annotation__thumbnail')
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+		.classed('is-visible', true)
 }
 
 function handlePlayExit(d) {
-	d3.select(this.parentNode).select('.detail__text').text('')
+	const parent = d3.select(this.parentNode)
+	parent.select('.detail__text').text('')
+	parent.select('.annotation__thumbnail')
+		.classed('is-visible', false)
 }
 
 function createAnnotation(d) {
@@ -120,12 +136,15 @@ function createAnnotation(d) {
 	const off = right ? 100 - percent : percent
 	const before = right ? '' : '&dtrif; '
 	const after = right ? ' &dtrif;' : ''
-	grandpa.select('.plays__annotation')
-		.append('p')
-			.html(`${before}${d.annotation}${after}`)
-			.style('margin-left', right ? 'auto' : `${off}%`)
-			.style('margin-right', right ? `${off}%` : 'auto')
-			.style('text-align', right ? 'right' : 'left')
+	grandpa.select('.plays__annotation').append('p')
+		.attr('class', 'annotation__text')
+		.html(`${before}${d.annotation}${after}`)
+		.style('margin-left', right ? 'auto' : `${off}%`)
+		.style('margin-right', right ? `${off}%` : 'auto')
+		.style('text-align', right ? 'right' : 'left')
+
+	grandpa.select('.plays__annotation').append('div')
+		.attr('class', 'annotation__thumbnail')
 }
 
 function createChart() {
