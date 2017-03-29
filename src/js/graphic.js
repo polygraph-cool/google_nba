@@ -113,6 +113,21 @@ function handlePlayExit(d) {
 	d3.select(this.parentNode).select('.detail__text').text('')
 }
 
+function createAnnotation(d) {
+	const grandpa = d3.select(this.parentNode.parentNode)
+	const right = d.index > NUM_VIDEOS / 2
+	const percent = Math.floor(d.index / NUM_VIDEOS * 100) + 1
+	const off = right ? 100 - percent : percent
+	const before = right ? '' : '&dtrif; '
+	const after = right ? ' &dtrif;' : ''
+	grandpa.select('.plays__annotation')
+		.append('p')
+			.html(`${before}${d.annotation}${after}`)
+			.style('margin-left', right ? 'auto' : `${off}%`)
+			.style('margin-right', right ? `${off}%` : 'auto')
+			.style('text-align', right ? 'right' : 'left')
+}
+
 function createChart() {
 	const year = graphic.selectAll('.year')
 		.data(dataByDecade)
@@ -151,20 +166,7 @@ function createChart() {
 		.on('mouseenter', handlePlayEnter)
 
 	item.filter(d => d.annotation)
-		.each(function(d) {
-			const grandpa = d3.select(this.parentNode.parentNode)
-			const right = d.index > NUM_VIDEOS / 2
-			const percent = Math.floor(d.index / NUM_VIDEOS * 100) + 1
-			const off = right ? 100 - percent : percent
-			const before = right ? '&dtrif; ' : ''
-			const after = right ? '' : ' &dtrif;'
-			grandpa.select('.plays__annotation')
-				.append('p')
-					.html(`${before}${d.annotation}${after}`)
-					.style('margin-left', right ? 'auto' : `${off}%`)
-					.style('margin-right', right ? `${off}%` : 'auto')
-					.style('text-align', right ? 'right' : 'left')
-		})
+		.each(createAnnotation)
 		// .append('p')
 		// .attr('class', 'item__annotation')
 		// .text(d => d.annotation)
