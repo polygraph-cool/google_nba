@@ -55,7 +55,6 @@
 	.item 
 		width 2%
 		height 2rem
-		// border-right 1px solid white
 		cursor pointer
 		position relative
 		&.is-active
@@ -73,9 +72,13 @@
 		position absolute
 		top 0
 		left 0
-		transform translateY(-83.3%)
+		// transform translateY(-83.3%)
+		transform translateY(-86%)
 		z-index set-index('overlay')
-		background black
+		background-color black
+		background-repeat no-repeat
+		background-position center center
+		background-size cover
 		&.is-visible
 			display block		
 
@@ -90,6 +93,7 @@
 		font-size 0.75rem
 		top 0
 		left 0
+
 	.chart__key
 		display flex
 		margin-top 2rem

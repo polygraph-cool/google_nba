@@ -116,7 +116,9 @@ function handlePlayEnter(d, i) {
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 
+	const url = `https://i.ytimg.com/vi/${d.external_video_id}/hqdefault.jpg`
 	grandpa.select('.annotation__thumbnail')
+		.style('background-image', `url("${url}")`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.classed('is-visible', true)
