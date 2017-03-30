@@ -6,19 +6,42 @@
 	justify-content space-between
 	align-items flex-end
 
+
 	.video__year
 		width 15%
+		display flex
+		flex-direction column
+		justify-content flex-end
+		flex-wrap	wrap
 		&.is-active
 			width 35%
-		
+			.year__label
+				font-size:16px;
+				font-weight:400;
+				color:#7d7d7d
+				.label__title
+					color #000
+
+
+
 	.year__label
 		text-transform capitalize
+		height: 50px;
+		order 2
 		font-size 0.8rem
 		font-weight bold
-		line-height 1.1
+		line-height 1.2
+		margin-top 5px;
 		padding-bottom 0.25rem
-	
+		margin-top: 5px;
+		padding-bottom: 0.25rem;
+		font-weight: 600;
+		color: #000;
+		font-size: 12px;
+
+
 	.label__title
-		margin-left 0.5rem
+		color:#7d7d7d
+		margin-left 4px
 		font-weight normal
 		font-size 0.9em

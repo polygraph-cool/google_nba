@@ -2,7 +2,8 @@
 	max-width 60rem
 	margin 0 auto
 	padding 1rem
-	
+	margin-bottom 10rem
+
 	.year
 		margin-bottom 0.5rem
 		display flex
@@ -12,12 +13,13 @@
 	.year:first-child
 		&:before
 			content '#1'
+			font-size 0.6rem
+			font-weight 600;
 			display block
 			position absolute
 			top 0
 			left 5rem
 			// transform translateY(-120%)
-			font-size 0.75rem
 		&:after
 			content '#100'
 			display block
@@ -26,33 +28,34 @@
 			right 0
 			// transform translateY(-120%)
 			font-size 0.75rem
-			
+			font-size: 0.6rem;
+			font-weight: 600;
+
 	.year__label
 		width 5rem
 		padding-right 0.5rem
-		font-size 0.8rem
-		line-height 1
+		font-size 0.7rem
+		line-height 21px
 		text-transform capitalize
 		text-align right
 		font-weight bold
-		margin-top 0.25rem
 
 	.year__plays
 		display flex
 		flex-grow 1
 		width auto
 		flex-wrap wrap
-	
+
 	.plays__detail
 		width 100%
 		display block
 		height 1rem
-		
+
 	.plays__items
 		display flex
 		width 100%
 		// flex-grow 1
-		
+
 	.item
 		height 1.25rem
 		cursor pointer
@@ -63,11 +66,11 @@
 			// border 3px solid $off-black
 			background-color $gray-dark
 		&.is-player
-			background-color purple
+			background-color #207bc0
 		&:hover
 			background-color $gray
 			// border 3px solid $off-black
-	
+
 	.plays__annotation
 		width 100%
 		position relative
@@ -86,19 +89,22 @@
 		background-position center center
 		background-size cover
 		&.is-visible
-			display block		
+			display block
 
 	.annotation__text
-		color red
-		font-size 0.7rem
-	
+		color #7d7d7d;
+		font-weight 600;
+		text-transform uppercase;
+		-webkit-font-smoothing antialiased;
+		font-size 0.6rem
 	.plays__detail
 		position relative
-	
+
 	.detail__text
 		position absolute
-		font-size 0.75rem
-		top 0
+		font-size 11px
+		top 2px
+		font-weight 600
 		left 0
 		visibility hidden
 		&.is-visible
@@ -114,4 +120,3 @@
 			width 6rem
 			text-align center
 			padding 0 1rem
-		
