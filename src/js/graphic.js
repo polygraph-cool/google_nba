@@ -60,13 +60,6 @@ function loadData() {
 					.entries(data)
 					// .sort((a, b) => d3.descending(a.key, b.key))
 
-
-				// TODO remove
-				dataByDecade.forEach(d => {
-					const ran = Math.floor(Math.random() * NUM_VIDEOS)
-					d.value[ran].annotation = 'random annotation for testing'
-				})
-
 				// console.log(dataByDecade)
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
@@ -123,7 +116,7 @@ function handlePlayClick(d, i) {
 	Youtube.jumpTo({ playerIndex, videoIndex: i })
 
 	// update label
-	Youtube.updateTitle({ playerIndex, title: `#${i + 1} ${d.title}` })
+	Youtube.updateTitle({ playerIndex, title: d.title })
 
 	// deactive other plays
 	d3.select(this.parentNode).selectAll('.item')
@@ -232,10 +225,23 @@ function createKey() {
 		.style('background-color', d => categoryColors[d])
 }
 
+function handleSearchChange() {
+	const name = this.value ? this.value.toLowerCase() : null
+	graphic.selectAll('.item')
+		.classed('is-player', false)
+		.filter(d => d.players.toLowerCase().includes(name))
+		.classed('is-player', true)
+}
+
+function setupSearch() {
+	d3.select('.search__input input')
+		.on('keyup', handleSearchChange)
+}
 function setup() {
 	Youtube.setup(dataByDecade)
 	createChart()
-	createKey()
+	// createKey()
+	setupSearch()
 	return Promise.resolve()
 }
 

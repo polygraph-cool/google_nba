@@ -35,7 +35,8 @@
 		text-transform capitalize
 		text-align right
 		font-weight bold
-		
+		margin-top 0.25rem
+
 	.year__plays
 		display flex
 		flex-grow 1
@@ -57,9 +58,12 @@
 		cursor pointer
 		position relative
 		background-color $gray-light
+		border-right 1px solid #fff
 		&.is-active
 			// border 3px solid $off-black
 			background-color $gray-dark
+		&.is-player
+			background-color purple
 		&:hover
 			background-color $gray
 			// border 3px solid $off-black
@@ -85,7 +89,7 @@
 			display block		
 
 	.annotation__text
-		color $gray-dark
+		color red
 		font-size 0.7rem
 	
 	.plays__detail
