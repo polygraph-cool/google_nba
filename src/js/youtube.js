@@ -7,6 +7,11 @@ const players = []
 const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
 let currentPlayerIndex = 0
+let currentVideoIndex = 0
+
+function getCurrent(i) {
+	return { player: i, video: players[i].videoIndex }
+}
 
 function resize() {
 	// resize
@@ -41,8 +46,8 @@ function onPlayerReady({ target }) {
 	if (!initialAutoplay && target.playerIndex === 0) {
 		initialAutoplay = true
 		target.playVideo()
-		Graphic.jumpToPlay({ playerIndex: 0, videoIndex: 0 })
 	}
+	Graphic.jumpToPlay({ playerIndex: target.playerIndex, videoIndex: target.videoIndex })
 }
 
 function pauseVideos() {
@@ -59,6 +64,7 @@ function updateTitle({ playerIndex, title }) {
 
 function jumpTo({ playerIndex, videoIndex }) {
 	currentPlayerIndex = playerIndex
+	currentVideoIndex = videoIndex
 	pauseVideos()
 
 	const player = players[playerIndex]
@@ -151,4 +157,4 @@ function init() {
 	})
 }
 
-export default { init, setup, resize, jumpTo, updateTitle }
+export default { init, setup, resize, jumpTo, updateTitle, getCurrent }

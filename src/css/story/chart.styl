@@ -4,7 +4,7 @@
 	padding 1rem
 	
 	.year
-		margin-bottom 1.5rem
+		margin-bottom 0.5rem
 		display flex
 		position relative
 		align-items center
@@ -19,7 +19,7 @@
 			// transform translateY(-120%)
 			font-size 0.75rem
 		&:after
-			content '#50'
+			content '#100'
 			display block
 			position absolute
 			top 0
@@ -52,15 +52,17 @@
 		width 100%
 		// flex-grow 1
 		
-	.item 
-		width 2%
-		height 2rem
+	.item
+		height 1.25rem
 		cursor pointer
 		position relative
+		background-color $gray-light
 		&.is-active
-			border 3px solid $off-black
+			// border 3px solid $off-black
+			background-color $gray-dark
 		&:hover
-			border 3px solid $off-black
+			background-color $gray
+			// border 3px solid $off-black
 	
 	.plays__annotation
 		width 100%
@@ -88,11 +90,15 @@
 	
 	.plays__detail
 		position relative
+	
 	.detail__text
 		position absolute
 		font-size 0.75rem
 		top 0
 		left 0
+		visibility hidden
+		&.is-visible
+			visibility visible
 
 	.chart__key
 		display flex

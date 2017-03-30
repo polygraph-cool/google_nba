@@ -6,7 +6,7 @@ import Youtube from './youtube'
 let dataByDecade = null
 let decades = null
 const graphic = d3.select('.graphic__chart')
-const NUM_VIDEOS = 50
+const NUM_VIDEOS = 100
 
 const categoryColors = {
 	dunk: '#e41a1c',
@@ -29,11 +29,11 @@ function decadeToIndex(decade) {
 
 function cleanData(row) {
 	// add in 2017 as its own decade
-	const truncated = row.title.substring(0, 30)
+	const truncated = row.title.substring(0, 50)
 	return {
 		...row,
 		agg_view_count: +row.agg_view_count,
-		title: `${truncated}${row.title.length > 30 ? '...' : ''}`,
+		title: `${truncated}${row.title.length > 50 ? '...' : ''}`,
 		// duration: +row.duration,
 		// categories: row.categories ? row.categories.split('|') : null,
 		decade_display: row.decade === '2017' ? 'this season' : `${row.decade}s`,
@@ -87,7 +87,35 @@ function jumpToPlay({ playerIndex, videoIndex }) {
 
 	// update label
 	const d = dataByDecade[playerIndex].value[videoIndex]
-	Youtube.updateTitle({ playerIndex, title: `#${videoIndex + 1} ${d.title}` })
+	Youtube.updateTitle({ playerIndex, title: d.title })
+	displayTitle({ decade: playerIndex, index: videoIndex, reset: true })
+}
+
+function displayTitle({ decade, index, reset }) {
+	const d = dataByDecade[decade].value[index]
+	const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
+
+	const w = year.node().offsetWidth
+	// // const itemW = this.getBoundingClientRect().width
+	const right = index > NUM_VIDEOS / 2
+	let x = Math.floor(w * index / NUM_VIDEOS)
+	if (right) x = w - x
+
+	const views = formatViews(d.agg_view_count)
+
+	year.select('.detail__text')
+		.text(`${d.title} ${views} views`)
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+		.classed('is-visible', true)
+
+	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
+
+	year.select('.annotation__thumbnail')
+		.style('background-image', `url("${url}")`)
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+		.classed('is-visible', !reset)
 }
 
 function handlePlayClick(d, i) {
@@ -104,34 +132,23 @@ function handlePlayClick(d, i) {
 	d3.select(this).classed('is-active', true)
 }
 
-function handlePlayEnter(d, i) {
-	const parent = this.parentNode
-	const parentW = parent.offsetWidth
-	const w = this.getBoundingClientRect().width
-	const right = i > NUM_VIDEOS / 2
-	let x = Math.floor(w * i)
-	if (right) x = parentW - x - w
-
-	const views = formatViews(d.agg_view_count)
-	const grandpa = d3.select(parent.parentNode)
-	grandpa.select('.detail__text')
-		.text(`${d.title} ${views} views`)
-		.style('left', right ? 'auto' : `${x}px`)
-		.style('right', right ? `${x}px` : 'auto')
-
-	const url = `https://i.ytimg.com/vi/${d.external_video_id}/hqdefault.jpg`
-	grandpa.select('.annotation__thumbnail')
-		.style('background-image', `url("${url}")`)
-		.style('left', right ? 'auto' : `${x}px`)
-		.style('right', right ? `${x}px` : 'auto')
-		.classed('is-visible', true)
+function handlePlayEnter(d) {
+	const decade = decadeToIndex(d.decade_display)
+	const index = d.index
+	displayTitle({ decade, index })
 }
 
-function handlePlayExit(d) {
+function handlePlayExit() {
 	const parent = d3.select(this.parentNode)
-	parent.select('.detail__text').text('')
+	parent.select('.detail__text')
+		.classed('is-visible', false)
+		.text('')
 	parent.select('.annotation__thumbnail')
 		.classed('is-visible', false)
+
+	const playerIndex = decadeToIndex(parent.datum().key)
+	const { player, video } = Youtube.getCurrent(playerIndex)
+	displayTitle({ decade: player, index: video, reset: true })
 }
 
 function createAnnotation(d) {
@@ -176,16 +193,14 @@ function createChart() {
 		.data(d => d.value)
 		.enter().append('div')
 
+	const itemWidth = 1 / NUM_VIDEOS * 100
+
 	item.attr('class', 'item')
-		.style('background-color', (d) => {
-			const cat = d.categories ? d.categories[0] : 'untagged'
-			return categoryColors[cat]
-		})
-		.style('color', (d) => {
-			const cat = d.categories ? d.categories[0] : 'untagged'
-			return categoryColors[cat]
-		})
-		.classed('is-active', (d, i) => i === 0)
+		.style('width', `${itemWidth}%`)
+		// .style('background-color', (d) => {
+		// 	const cat = d.categories ? d.categories[0] : 'untagged'
+		// 	return categoryColors[cat]
+		// })
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
 
@@ -197,9 +212,10 @@ function createChart() {
 
 	detail.append('p')
 		.attr('class', 'detail__text')
-		.text(d => {
-			const views = formatViews(d.value[0].agg_view_count)
-			return `tk title here ${views} views`
+		.text((d) => {
+			const first = d.value[0]
+			const views = formatViews(first.agg_view_count)
+			return `${first.title} ${views} views`
 		})
 }
 
