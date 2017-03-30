@@ -29,42 +29,45 @@ function decadeToIndex(decade) {
 
 function cleanData(row) {
 	// add in 2017 as its own decade
+	const truncated = row.title.substring(0, 30)
 	return {
 		...row,
-		estimated_view_count: +row.estimated_view_count,
-		duration: +row.duration,
-		categories: row.categories ? row.categories.split('|') : null,
-		decade_display: row.date.substring(0, 4) === '2017' ? 'this season' : `${row.decade}s`,
-		title: 'Tk title here', // TODO
+		agg_view_count: +row.agg_view_count,
+		title: `${truncated}${row.title.length > 30 ? '...' : ''}`,
+		// duration: +row.duration,
+		// categories: row.categories ? row.categories.split('|') : null,
+		decade_display: row.decade === '2017' ? 'this season' : `${row.decade}s`,
 	}
 }
 
 function rollupDecade(values) {
-	const sorted = values.sort((a, b) =>
-		d3.descending(a.estimated_view_count, b.estimated_view_count)
-	)
-	// TODO remove 1, + 1 slice, this is temp
-	return sorted
-		.slice(1, NUM_VIDEOS + 1)
+	// const sorted = values.sort((a, b) =>
+	// 	d3.descending(a.agg_view_count, b.agg_view_count)
+	// )
+	return values
+		.slice(0, NUM_VIDEOS)
 		.map((d, i) => ({ ...d, index: i }))
 }
 
 function loadData() {
 	return new Promise((resolve, reject) => {
-		d3.csv('assets/plays.csv', cleanData, (err, data) => {
+		d3.csv('assets/curated_merged_by_decade.csv', cleanData, (err, data) => {
 			if (err) reject(err)
 			else {
 				dataByDecade = d3.nest()
-					.key(d => d.decade_display)
+					.key(d => d.decade_display).sortKeys(d3.descending)
 					.rollup(rollupDecade)
 					.entries(data)
-					.sort((a, b) => d3.descending(a.key, b.key))
+					// .sort((a, b) => d3.descending(a.key, b.key))
+
 
 				// TODO remove
 				dataByDecade.forEach(d => {
 					const ran = Math.floor(Math.random() * NUM_VIDEOS)
 					d.value[ran].annotation = 'random annotation for testing'
 				})
+
+				// console.log(dataByDecade)
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -109,7 +112,7 @@ function handlePlayEnter(d, i) {
 	let x = Math.floor(w * i)
 	if (right) x = parentW - x - w
 
-	const views = formatViews(d.estimated_view_count)
+	const views = formatViews(d.agg_view_count)
 	const grandpa = d3.select(parent.parentNode)
 	grandpa.select('.detail__text')
 		.text(`${d.title} ${views} views`)
@@ -195,7 +198,7 @@ function createChart() {
 	detail.append('p')
 		.attr('class', 'detail__text')
 		.text(d => {
-			const views = formatViews(d.value[0].estimated_view_count)
+			const views = formatViews(d.value[0].agg_view_count)
 			return `tk title here ${views} views`
 		})
 }

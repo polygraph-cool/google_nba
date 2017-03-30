@@ -6,4 +6,4 @@ github:
 	git push
 
 copy-data:
-	cp ../google_nba-data/processing/data/web.csv src/assets/plays.csv
+	cp ../google_nba-data/processing/data/curated_merged_by_decade.csv src/assets
