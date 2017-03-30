@@ -226,7 +226,9 @@ function createKey() {
 }
 
 function handleSearchChange() {
-	const name = this.value ? this.value.toLowerCase() : null
+	let name = this.value ? this.value.toLowerCase() : null
+	name = name.length > 2 ? name : null
+
 	graphic.selectAll('.item')
 		.classed('is-player', false)
 		.filter(d => d.players.toLowerCase().includes(name))
