@@ -145,6 +145,7 @@ function handlePlayExit() {
 }
 
 function createAnnotation(d) {
+	console.log(d)
 	const grandpa = d3.select(this.parentNode.parentNode)
 	const right = d.index > NUM_VIDEOS / 2
 	const percent = Math.floor(d.index / NUM_VIDEOS * 100) + 1
