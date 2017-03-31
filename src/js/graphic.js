@@ -148,7 +148,7 @@ function createAnnotation(d) {
 	console.log(d)
 	const grandpa = d3.select(this.parentNode.parentNode)
 	const right = d.index > NUM_VIDEOS / 2
-	const percent = Math.floor(d.index / NUM_VIDEOS * 100) + 1
+	const percent = Math.floor(d.index / NUM_VIDEOS * 100)
 	const off = right ? 100 - percent : percent
 	const before = right ? '' : '&dtrif; '
 	const after = right ? ' &dtrif;' : ''
