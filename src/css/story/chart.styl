@@ -1,15 +1,13 @@
 .graphic__chart
-	// max-width 50rem
 	width 60%
-	// margin 0 auto
 	padding 1rem
-	// margin-bottom 10rem
 
 	.year
 		margin-bottom 0.5rem
 		display flex
 		position relative
 		align-items center
+		padding-bottom 0.5rem
 
 	.year:first-child
 		&:before
@@ -20,7 +18,6 @@
 			position absolute
 			top 0
 			left 5rem
-			// transform translateY(-120%)
 		&:after
 			content '#100'
 			font-size 0.6rem
@@ -29,7 +26,6 @@
 			position absolute
 			top 0
 			right 0
-			// transform translateY(-120%)
 
 	.year__label
 		width 5rem
@@ -38,7 +34,6 @@
 		text-transform capitalize
 		text-align right
 		font-weight bold
-		// transform translateY(-40%)
 
 	.year__plays
 		display flex
@@ -54,7 +49,6 @@
 	.plays__items
 		display flex
 		width 100%
-		// flex-grow 1
 
 	.item
 		height 1.25rem
@@ -63,13 +57,11 @@
 		background-color $gray-light
 		border-right 1px solid #fff
 		&.is-active
-			// border 3px solid $off-black
 			background-color $gray-dark
 		&.is-player
 			background-color #207bc0
 		&:hover
 			background-color $gray
-			// border 3px solid $off-black
 
 	.plays__annotation
 		width 100%
@@ -81,7 +73,6 @@
 		position absolute
 		top 0
 		left 0
-		// transform translateY(-83.3%)
 		transform translateY(-86%)
 		z-index set-index('overlay')
 		background-color black
