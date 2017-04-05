@@ -3,28 +3,20 @@ import Graphic from './graphic'
 
 let ready = false
 let initialAutoplay = false
-const players = []
+let player = null
 const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
-let currentPlayerIndex = 0
-let currentVideoIndex = 0
+let dataByDecade = null
 
 function getCurrent(i) {
-	return { player: i, video: players[i].videoIndex }
+	return { player: i, video: player.videoIndex }
 }
 
 function resize() {
-	// resize
-	graphic.selectAll('.video__year').classed('is-active', false)
-	graphic.select(`.video__year--${currentPlayerIndex}`).classed('is-active', true)
-
-	if (players.length) {
-		players.forEach((player, i) => {
-			const year = graphic.select(`.video__year--${i}`)
-			const width = year.node().offsetWidth
-			const height = Math.floor(width / RATIO)
-			player.setSize(width, height)
-		})
+	if (player) {
+		const width = graphic.select('.year__video').node().offsetWidth
+		const height = Math.floor(width / RATIO)
+		player.setSize(width, height)
 	}
 }
 
@@ -43,34 +35,23 @@ function loadScript() {
 }
 
 function onPlayerReady({ target }) {
-	if (!initialAutoplay && target.playerIndex === 0) {
+	if (!initialAutoplay) {
 		initialAutoplay = true
 		target.playVideo()
 	}
-	Graphic.jumpToPlay({ playerIndex: target.playerIndex, videoIndex: target.videoIndex })
+	Graphic.jumpToPlay(target)
 }
 
-function pauseVideos() {
-	players.forEach((player, i) => {
-		if (i !== currentPlayerIndex) player.pauseVideo()
-	})
+function updateTitle({ decadeIndex, title }) {
+	graphic.select('.label__year').text(dataByDecade[decadeIndex].key)
+	graphic.select('.label__title').text(title)
 }
 
-function updateTitle({ playerIndex, title }) {
-	graphic.selectAll('.label__title')
-		.filter((d, i) => i === playerIndex)
-		.text(title)
-}
-
-function jumpTo({ playerIndex, videoIndex }) {
-	currentPlayerIndex = playerIndex
-	currentVideoIndex = videoIndex
-	pauseVideos()
-
-	const player = players[playerIndex]
+function jumpTo({ decadeIndex, videoIndex }) {
 	player.videoIndex = videoIndex
-	player.loadVideoById(player.nbaPlaylist[videoIndex])
-
+	player.decadeIndex = videoIndex
+	const id = dataByDecade[decadeIndex].value[videoIndex].external_video_id
+	player.loadVideoById(id)
 	resize()
 }
 
@@ -78,25 +59,22 @@ function onPlayerStateChange({ data, target }) {
 	// end of video, move on to next
 	if (data === 0) {
 		target.videoIndex++
-		if (target.videoIndex >= target.nbaPlaylist.length) target.videoIndex = 0
+		if (target.videoIndex >= dataByDecade.value.length) target.videoIndex = 0
 		const params = {
-			playerIndex: target.playerIndex,
+			decadeIndex: target.decadeIndex,
 			videoIndex: target.videoIndex,
 		}
 		jumpTo(params)
 		Graphic.jumpToPlay(params)
 	} else if (data === 1) {
-		currentPlayerIndex = target.playerIndex
-		pauseVideos()
 		resize()
 	}
 }
 
-function setupPlayer(d, i) {
-	const playlist = d.value.map(v => v.external_video_id)
-
-	const player = new YT.Player(`player--${i}`, {
-		videoId: playlist[0],
+function setupPlayer() {
+	const first = dataByDecade[0].value[0]
+	player = new YT.Player('player', {
+		videoId: first.external_video_id,
 		playerVars: {
 			controls: 1,
 			cc_load_policy: 0,
@@ -114,28 +92,28 @@ function setupPlayer(d, i) {
 	})
 
 	player.videoIndex = 0
-	player.nbaPlaylist = playlist
-	player.playerIndex = i
-	players.push(player)
+	player.decadeIndex = 0
+	// player.nbaPlaylist = playlist
+	// player.decadeIndex = i
+	// players.push(player)
 }
 
 function setup(data) {
-	const year = graphic.selectAll('.year')
-		.data(data)
-	.enter().append('div')
-		.attr('class', (d, i) => `video__year video__year--${i}`)
-		.classed('is-active', d => d.key === '2010')
+	dataByDecade = data
 
-	year.append('p')
+	graphic.append('div')
+		.attr('class', 'year__video')
+	.append('div')
+		.attr('id', 'player')
+
+	const label = graphic.append('p')
 		.attr('class', 'year__label')
-		.text(d => `${d.key}`)
-	.append('span')
+	label.append('span')
+		.attr('class', 'label__year')
+	label.append('span')
 		.attr('class', 'label__title')
 
-	year.append('div').attr('id', (d, i) => `player--${i}`)
-
-	year.each(setupPlayer)
-
+	setupPlayer()
 	resize()
 }
 

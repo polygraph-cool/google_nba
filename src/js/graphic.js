@@ -76,35 +76,26 @@ function loadData() {
 	})
 }
 
-function jumpToPlay({ playerIndex, videoIndex }) {
-	const year = graphic.selectAll('.year')
-		.filter((d, i) => i === playerIndex)
-
-	year.selectAll('.item')
-		.classed('is-active', false)
-		.filter((d, i) => i === videoIndex)
-			.classed('is-active', true)
-
-	// update label
-	const d = dataByDecade[playerIndex].value[videoIndex]
-	Youtube.updateTitle({ playerIndex, title: d.title })
-	displayTitle({ decade: playerIndex, index: videoIndex, reset: true })
-}
-
 function displayTitle({ decade, index, reset }) {
 	const d = dataByDecade[decade].value[index]
 	const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
 
 	const w = year.node().offsetWidth
-	// // const itemW = this.getBoundingClientRect().width
-	const right = index > NUM_VIDEOS / 2
+	// const right = index > NUM_VIDEOS / 2
 	let x = Math.floor(w * index / NUM_VIDEOS)
-	if (right) x = w - x
-
+	// if (right) x = w - x
 	const views = formatViews(d.agg_view_count)
 
-	year.select('.detail__text')
-		.text(`${d.date}: ${d.title} (${views} views)`)
+	const detailText = year.select('.detail__text')
+
+	detailText.text(`${d.date}: ${d.title} (${views} views)`)
+
+	const detailWidth = Math.ceil(detailText.node().getBoundingClientRect().width)
+
+	const right = x + detailWidth > w
+
+	detailText
+		.style('width', `${detailWidth}px`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.classed('is-visible', true)
@@ -118,12 +109,27 @@ function displayTitle({ decade, index, reset }) {
 		.classed('is-visible', !reset)
 }
 
-function handlePlayClick(d, i) {
-	const playerIndex = decadeToIndex(d.decade_display)
-	Youtube.jumpTo({ playerIndex, videoIndex: i })
+function jumpToPlay({ decadeIndex, videoIndex }) {
+	const year = graphic.selectAll('.year')
+		.filter((d, i) => i === decadeIndex)
+
+	year.selectAll('.item')
+		.classed('is-active', false)
+		.filter((d, i) => i === videoIndex)
+			.classed('is-active', true)
 
 	// update label
-	Youtube.updateTitle({ playerIndex, title: d.title })
+	const d = dataByDecade[decadeIndex].value[videoIndex]
+	Youtube.updateTitle({ decadeIndex, title: d.title })
+	displayTitle({ decade: decadeIndex, index: videoIndex, reset: true })
+}
+
+function handlePlayClick(d, i) {
+	const decadeIndex = decadeToIndex(d.decade_display)
+	Youtube.jumpTo({ decadeIndex, videoIndex: i })
+
+	// update label
+	Youtube.updateTitle({ decadeIndex, title: d.title })
 
 	// deactive other plays
 	d3.select(this.parentNode).selectAll('.item')
@@ -146,13 +152,13 @@ function handlePlayExit() {
 	parent.select('.annotation__thumbnail')
 		.classed('is-visible', false)
 
-	const playerIndex = decadeToIndex(parent.datum().key)
-	const { player, video } = Youtube.getCurrent(playerIndex)
+	const decadeIndex = decadeToIndex(parent.datum().key)
+	const { player, video } = Youtube.getCurrent(decadeIndex)
 	displayTitle({ decade: player, index: video, reset: true })
 }
 
 function createAnnotation(d) {
-	console.log(d)
+	// console.log(d)
 	const grandpa = d3.select(this.parentNode.parentNode)
 	const right = d.index > NUM_VIDEOS / 2
 	const percent = Math.floor(d.index / NUM_VIDEOS * 100)
@@ -198,15 +204,11 @@ function createChart() {
 
 	item.attr('class', 'item')
 		.style('width', `${itemWidth}%`)
-		// .style('background-color', (d) => {
-		// 	const cat = d.categories ? d.categories[0] : 'untagged'
-		// 	return categoryColors[cat]
-		// })
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
 
-	item.filter(d => d.annotation)
-		.each(createAnnotation)
+	// item.filter(d => d.annotation)
+	// 	.each(createAnnotation)
 
 	const detail = plays.append('div')
 		.attr('class', 'plays__detail')
@@ -247,10 +249,18 @@ function setupSearch() {
 	d3.select('.search__input input')
 		.on('keyup', handleSearchChange)
 }
+
+function setupTitles() {
+	dataByDecade.forEach((d, i) => {
+		displayTitle({ decade: i, index: 0, reset: true })
+	})
+}
+
 function setup() {
 	Youtube.setup(dataByDecade)
 	createChart()
 	// createKey()
+	setupTitles()
 	setupSearch()
 	return Promise.resolve()
 }
