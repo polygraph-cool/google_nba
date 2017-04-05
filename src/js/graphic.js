@@ -63,6 +63,10 @@ function loadData() {
 					.entries(data)
 					// .sort((a, b) => d3.descending(a.key, b.key))
 
+				// fake annotations
+				dataByDecade.forEach(d => {
+					d.value[0].annotation = 'tk'
+				})
 				// console.log(dataByDecade)
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
