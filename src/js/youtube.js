@@ -59,7 +59,7 @@ function onPlayerStateChange({ data, target }) {
 	// end of video, move on to next
 	if (data === 0) {
 		target.videoIndex++
-		if (target.videoIndex >= dataByDecade.value.length) target.videoIndex = 0
+		if (target.videoIndex >= dataByDecade[target.decadeIndex].value.length) target.videoIndex = 0
 		const params = {
 			decadeIndex: target.decadeIndex,
 			videoIndex: target.videoIndex,

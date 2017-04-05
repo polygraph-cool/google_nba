@@ -63,10 +63,10 @@ function loadData() {
 					.entries(data)
 					// .sort((a, b) => d3.descending(a.key, b.key))
 
-				// fake annotations
 				dataByDecade.forEach(d => {
 					d.value[0].annotation = 'tk'
 				})
+
 				// console.log(dataByDecade)
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
@@ -81,24 +81,26 @@ function displayTitle({ decade, index, reset }) {
 	const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
 
 	const w = year.node().offsetWidth
-	// const right = index > NUM_VIDEOS / 2
+	const right = index > NUM_VIDEOS / 2
 	let x = Math.floor(w * index / NUM_VIDEOS)
-	// if (right) x = w - x
+	if (right) x = w - x
 	const views = formatViews(d.agg_view_count)
 
 	const detailText = year.select('.detail__text')
 
-	detailText.text(`${d.date}: ${d.title} (${views} views)`)
-
-	const detailWidth = Math.ceil(detailText.node().getBoundingClientRect().width)
-
-	const right = x + detailWidth > w
-
 	detailText
-		.style('width', `${detailWidth}px`)
+		.text(`${d.date}: ${d.title} (${views} views)`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.classed('is-visible', true)
+
+	// const detailWidth = Math.ceil(detailText.node().getBoundingClientRect().width)
+
+	// const right = x + detailWidth > w
+
+	// detailText
+	// 	.style('width', `${detailWidth}px`)
+		
 
 	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
 
@@ -207,8 +209,8 @@ function createChart() {
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
 
-	// item.filter(d => d.annotation)
-	// 	.each(createAnnotation)
+	item.filter(d => d.annotation)
+		.each(createAnnotation)
 
 	const detail = plays.append('div')
 		.attr('class', 'plays__detail')
