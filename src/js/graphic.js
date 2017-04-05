@@ -23,19 +23,22 @@ function formatViews(num) {
 	return d3.format('.2s')(num)
 }
 
+function formatDate(str) {
+	const t = d3.timeParse('%Y%m%d')(str)
+	return d3.timeFormat('%b %d, %Y')(t)
+}
+
 function decadeToIndex(decade) {
 	return decades.findIndex(d => d === decade)
 }
 
 function cleanData(row) {
 	// add in 2017 as its own decade
-	const truncated = row.title.substring(0, 50)
 	return {
 		...row,
 		agg_view_count: +row.agg_view_count,
-		title: `${truncated}${row.title.length > 50 ? '...' : ''}`,
-		// duration: +row.duration,
-		// categories: row.categories ? row.categories.split('|') : null,
+		title: row.title_custom,
+		date: formatDate(row.date),
 		decade_display: row.decade === '2017' ? 'this season' : `${row.decade}s`,
 	}
 }
@@ -97,7 +100,7 @@ function displayTitle({ decade, index, reset }) {
 	const views = formatViews(d.agg_view_count)
 
 	year.select('.detail__text')
-		.text(`${d.title} ${views} views`)
+		.text(`${d.date}: ${d.title} (${views} views)`)
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.classed('is-visible', true)
@@ -227,7 +230,7 @@ function createKey() {
 }
 
 function handleSearchChange() {
-	let name = this.value ? this.value.toLowerCase() : null
+	let name = this.value ? this.value.toLowerCase() : ''
 	name = name.length > 2 ? name : null
 
 	graphic.selectAll('.item')
