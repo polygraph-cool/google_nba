@@ -90,23 +90,27 @@ function loadData() {
 }
 
 function displayTitle({ decade, index, reset }) {
-	// const d = dataByDecade[decade].value[index]
-	// const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
+	const d = dataByDecade[decade].value[index]
+	const year = graphic.selectAll('.year__chart').filter((d, i) => i === decade)
 
-	// const w = year.node().offsetWidth
-	// const right = index > NUM_VIDEOS / 2
-	// let x = Math.floor(w * index / NUM_VIDEOS)
-	// if (right) x = w - x
-	// const views = formatViews(d.agg_view_count)
+	const w = year.node().offsetWidth
+	const right = index > NUM_VIDEOS / 2
+	const pos = scale.position(index) + MARGIN.left
+	const x = right ? w - pos : pos
+	const y = chartHeight - scale.size[decade](d.agg_view_count)
+	const views = formatViews(d.agg_view_count)
 
-	// const detailText = year.select('.detail__text')
+	const detail = year.select('.year__detail')
 
-	// detailText
-	// 	.text(`${d.date}: ${d.title} (${views} views)`)
-	// 	.style('left', right ? 'auto' : `${x}px`)
-	// 	.style('right', right ? `${x}px` : 'auto')
-	// 	.classed('is-visible', true)
-		
+	detail.select('.detail__text')
+		.text(`${d.date}: ${d.title} (${views} views)`)
+
+	detail
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+		.style('top', `${y}px`)
+		.classed('is-visible', true)
+
 	// const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
 
 	// year.select('.annotation__thumbnail')
@@ -198,7 +202,7 @@ function createChart() {
 
 	text.append('p')
 		.attr('class', 'text__description')
-		.text(d => `Tk description here.`)
+		.text(d => `What is the most watch NBA video of all-time? We identified over 200,000 NBA videos.`)
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
@@ -223,16 +227,16 @@ function createChart() {
 
 	item.append('rect')
 
-	const detail = g.append('g')
-		.attr('class', 'g-detail')
+	const detail = yearChart.append('div')
+		.attr('class', 'year__detail')
 
-	// detail.append('p')
-	// 	.attr('class', 'detail__text')
-	// 	.text((d) => {
-	// 		const first = d.value[0]
-	// 		const views = formatViews(first.agg_view_count)
-	// 		return `${first.title} ${views} views`
-	// 	})
+	detail.append('p')
+		.attr('class', 'detail__text')
+		.text((d) => {
+			const first = d.value[0]
+			const views = formatViews(first.agg_view_count)
+			return `${first.title} ${views} views`
+		})
 }
 
 function createKey() {
@@ -321,7 +325,7 @@ function resize() {
 			const v = scale.size[index](d.agg_view_count)
 			return v
 		})
-		.attr('x', (d, i) => scale.position(i))
+		.attr('x', d => scale.position(d.index))
 		.attr('y', (d) => {
 			const index = decadeToIndex(d.decade_display)
 			const v = chartHeight - scale.size[index](d.agg_view_count)

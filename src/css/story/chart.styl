@@ -2,39 +2,24 @@
 	width 60%
 	padding 1rem
 
+	.year__chart
+		position relative
+		margin-bottom 2rem
+
 	.year__text
 		display flex
 		align-items center
-		padding-bottom 0.5rem
-
-	// .year:first-child
-	// 	&:before
-	// 		content '#1'
-	// 		font-size 0.6rem
-	// 		font-weight bold
-	// 		display block
-	// 		position absolute
-	// 		top 0
-	// 		left 5rem
-	// 	&:after
-	// 		content '#100'
-	// 		font-size 0.6rem
-	// 		font-weight bold
-	// 		display block
-	// 		position absolute
-	// 		top 0
-	// 		right 0
+		padding-bottom 1rem
 
 	.text__label
+		width 15rem
 		padding-right 1rem
+		padding-left 1rem
 		font-size 1.5rem
 		text-transform capitalize
-
-	.year__plays
-		display flex
-		flex-grow 1
-		width auto
-		flex-wrap wrap
+	
+	.text__description
+		font-size 0.9rem
 
 	.plays__detail
 		width 100%
@@ -46,13 +31,9 @@
 		width 100%
 
 	.item
-		// height 1.25rem
 		cursor pointer
 		stroke #fff
 		fill $gray-light
-		// position relative
-		// background-color $gray-light
-		// border-right 1px solid #fff
 		&.is-active
 			fill $gray-dark
 		&.is-player
@@ -85,18 +66,19 @@
 		text-transform uppercase
 		font-size 0.6rem
 		visibility hidden
-	.plays__detail
-		position relative
-
-	.detail__text
+	
+	.year__detail 
 		position absolute
-		padding-top 0.25em
-		font-size 0.65rem
-		line-height 1.2
-		font-weight bold
-		visibility hidden
+		top 0
+		left 0
 		&.is-visible
 			visibility visible
+
+	.detail__text
+		font-size 0.65rem
+		font-weight bold
+		line-height 1.25
+		text-shadow 0 0 3px white
 
 	.chart__key
 		display flex

@@ -1,33 +1,35 @@
 .graphic__ui
 	margin 0 auto
-	padding 1rem 2rem
-	display flex
+	padding 1rem 0
+
 	.ui__search
-		display:flex;
-		.search__label
+		display flex
+	
+	.search__label
+		font-size 0.8rem
+		margin-right 0.5em
+		text-transform uppercase
+		font-weight bold
+		letter-spacing 0.05em
+		line-height 1.5
+	
+	.search__input
+		display block
+		position relative
+		&:before
+			content ''
+			width 0.5rem
+			height 100%
+			display inline-block
+			position absolute
+			top 0
+			left 0
+			background-color #207bc0
+		input
+			width 8rem
+			border none
+			border-bottom 1px solid $off-black
 			font-size 0.8rem
-			margin-right 0.5em
-			text-transform uppercase
-			font-weight bold
-			letter-spacing 0.05em
+			color $gray-dark
+			margin-left 1.5rem
 			line-height 1.5
-		.search__input
-			display block
-			position relative
-			&:before
-				content ''
-				width 0.5rem
-				height 100%
-				display inline-block
-				position absolute
-				top 0
-				left 0
-				background-color #207bc0
-			input
-				width 8rem
-				border none
-				border-bottom 1px solid $off-black
-				font-size 0.8rem
-				color $gray-dark
-				margin-left 1.5rem
-				line-height 1.5
