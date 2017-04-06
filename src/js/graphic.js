@@ -1,12 +1,22 @@
 import * as d3 from 'd3'
 import 'promis'
+import Inview from 'in-view'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 
+let rawData = null
 let dataByDecade = null
 let decades = null
+
+let chartWidth = 0
+let chartHeight = 0
 const graphic = d3.select('.graphic__chart')
+
+const scale = { position: d3.scaleBand(), size: null }
 const NUM_VIDEOS = 100
+const MARGIN = { top: 20, right: 20, bottom: 20, left: 20 }
+const RATIO = 3
+
 
 const categoryColors = {
 	dunk: '#e41a1c',
@@ -57,6 +67,7 @@ function loadData() {
 		d3.csv('assets/curated_merged_by_decade.csv', cleanData, (err, data) => {
 			if (err) reject(err)
 			else {
+				rawData = data
 				dataByDecade = d3.nest()
 					.key(d => d.decade_display).sortKeys(d3.descending)
 					.rollup(rollupDecade)
@@ -77,38 +88,30 @@ function loadData() {
 }
 
 function displayTitle({ decade, index, reset }) {
-	const d = dataByDecade[decade].value[index]
-	const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
+	// const d = dataByDecade[decade].value[index]
+	// const year = graphic.selectAll('.year__plays').filter((d, i) => i === decade)
 
-	const w = year.node().offsetWidth
-	const right = index > NUM_VIDEOS / 2
-	let x = Math.floor(w * index / NUM_VIDEOS)
-	if (right) x = w - x
-	const views = formatViews(d.agg_view_count)
+	// const w = year.node().offsetWidth
+	// const right = index > NUM_VIDEOS / 2
+	// let x = Math.floor(w * index / NUM_VIDEOS)
+	// if (right) x = w - x
+	// const views = formatViews(d.agg_view_count)
 
-	const detailText = year.select('.detail__text')
-
-	detailText
-		.text(`${d.date}: ${d.title} (${views} views)`)
-		.style('left', right ? 'auto' : `${x}px`)
-		.style('right', right ? `${x}px` : 'auto')
-		.classed('is-visible', true)
-
-	// const detailWidth = Math.ceil(detailText.node().getBoundingClientRect().width)
-
-	// const right = x + detailWidth > w
+	// const detailText = year.select('.detail__text')
 
 	// detailText
-	// 	.style('width', `${detailWidth}px`)
+	// 	.text(`${d.date}: ${d.title} (${views} views)`)
+	// 	.style('left', right ? 'auto' : `${x}px`)
+	// 	.style('right', right ? `${x}px` : 'auto')
+	// 	.classed('is-visible', true)
 		
+	// const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
 
-	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
-
-	year.select('.annotation__thumbnail')
-		.style('background-image', `url("${url}")`)
-		.style('left', right ? 'auto' : `${x}px`)
-		.style('right', right ? `${x}px` : 'auto')
-		.classed('is-visible', !reset)
+	// year.select('.annotation__thumbnail')
+	// 	.style('background-image', `url("${url}")`)
+	// 	.style('left', right ? 'auto' : `${x}px`)
+	// 	.style('right', right ? `${x}px` : 'auto')
+	// 	.classed('is-visible', !reset)
 }
 
 function jumpToPlay({ decadeIndex, videoIndex }) {
@@ -184,44 +187,50 @@ function createChart() {
 		.enter().append('div')
 			.attr('class', 'year')
 
-	year.append('p')
-		.attr('class', 'year__label')
+	const text = year.append('div')
+		.attr('class', 'year__text')
+
+	text.append('p')
+		.attr('class', 'text__label')
 		.text(d => `${d.key}`)
 
-	const plays = year.append('div')
-		.attr('class', 'year__plays')
+	text.append('p')
+		.attr('class', 'text__description')
+		.text(d => `Tk description here.`)
 
-	plays.append('div')
-		.attr('class', 'plays__annotation')
+	const chart = year.append('div')
+		.attr('class', 'year__chart')
 
-	const items = plays.append('div')
-		.attr('class', 'plays__items')
+	const svg = chart.append('svg')
+		.attr('class', 'chart__svg')
+
+	const g = svg.append('g')
+		.attr('class', 'g-graphic')
+
+	const items = g.append('g')
+		.attr('class', 'g-items')
 		.on('mouseleave', handlePlayExit)
 
 	const item = items.selectAll('.item')
 		.data(d => d.value)
-		.enter().append('div')
-
-	const itemWidth = 1 / NUM_VIDEOS * 100
+		.enter().append('g')
 
 	item.attr('class', 'item')
-		.style('width', `${itemWidth}%`)
 		.on('click', handlePlayClick)
 		.on('mouseenter', handlePlayEnter)
 
-	item.filter(d => d.annotation)
-		.each(createAnnotation)
+	item.append('rect')
 
-	const detail = plays.append('div')
-		.attr('class', 'plays__detail')
+	const detail = g.append('g')
+		.attr('class', 'g-detail')
 
-	detail.append('p')
-		.attr('class', 'detail__text')
-		.text((d) => {
-			const first = d.value[0]
-			const views = formatViews(first.agg_view_count)
-			return `${first.title} ${views} views`
-		})
+	// detail.append('p')
+	// 	.attr('class', 'detail__text')
+	// 	.text((d) => {
+	// 		const first = d.value[0]
+	// 		const views = formatViews(first.agg_view_count)
+	// 		return `${first.title} ${views} views`
+	// 	})
 }
 
 function createKey() {
@@ -247,6 +256,19 @@ function handleSearchChange() {
 		.classed('is-player', true)
 }
 
+function setupScales() {
+	scale.position
+		.domain(d3.range(0, NUM_VIDEOS))
+		.padding(0.2)
+
+	scale.size = decades.map((d, i) => {
+		const max = d3.max(dataByDecade[i].value, x => x.agg_view_count)
+		return d3.scalePow()
+			.domain([0, max])
+			.exponent(0.5)
+	})
+}
+
 function setupSearch() {
 	d3.select('.search__input input')
 		.on('keyup', handleSearchChange)
@@ -258,17 +280,62 @@ function setupTitles() {
 	})
 }
 
+function updateScales() {
+	scale.position.range([0, chartWidth])
+	scale.size.forEach(s => s.range([0, chartHeight]))
+}
+
+function resize() {
+	Youtube.resize()
+	const svg = graphic.selectAll('.chart__svg')
+	const chart = graphic.select('.year__chart')
+	const w = chart.node().offsetWidth
+	const h = Math.floor(w / RATIO)
+
+	chartWidth = w - MARGIN.left - MARGIN.right
+	chartHeight = h - MARGIN.top - MARGIN.bottom
+
+	updateScales()
+
+	chart
+		.style('width', `${chartWidth}px`)
+		.style('height', `${chartHeight}px`)
+
+	svg
+		.style('width', chartWidth + MARGIN.left + MARGIN.right)
+		.style('height', chartHeight + MARGIN.top + MARGIN.bottom)
+
+	svg.select('g')
+		.attr('transform', `translate(${MARGIN.left}, ${MARGIN.top})`)
+
+	const x = scale.position.bandwidth()
+	const minHeight = 10
+
+	svg.selectAll('.item rect')
+		.attr('width', x)
+		.attr('height', (d) => {
+			const index = decadeToIndex(d.decade_display)
+			const v = scale.size[index](d.agg_view_count)
+			return v
+		})
+		.attr('x', (d, i) => scale.position(i))
+		.attr('y', (d) => {
+			const index = decadeToIndex(d.decade_display)
+			const v = chartHeight - scale.size[index](d.agg_view_count)
+			return v
+		})
+}
+
+
 function setup() {
+	setupScales()
 	Youtube.setup(dataByDecade)
 	createChart()
 	// createKey()
 	setupTitles()
 	setupSearch()
+	resize()
 	return Promise.resolve()
-}
-
-function resize() {
-	Youtube.resize()
 }
 
 function init() {
