@@ -1,6 +1,6 @@
 import * as d3 from 'd3'
 import 'promis'
-import Inview from 'in-view'
+import ScrollMagic from 'scrollmagic'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 
@@ -10,7 +10,9 @@ let decades = null
 
 let chartWidth = 0
 let chartHeight = 0
-const graphic = d3.select('.graphic__chart')
+const graphic = d3.select('.graphic')
+const chart = graphic.select('.graphic__chart')
+const video = graphic.select('.graphic__video')
 
 const scale = { position: d3.scaleBand(), size: null }
 const NUM_VIDEOS = 100
@@ -115,7 +117,7 @@ function displayTitle({ decade, index, reset }) {
 }
 
 function jumpToPlay({ decadeIndex, videoIndex }) {
-	const year = graphic.selectAll('.year')
+	const year = chart.selectAll('.year')
 		.filter((d, i) => i === decadeIndex)
 
 	year.selectAll('.item')
@@ -182,7 +184,7 @@ function createAnnotation(d) {
 }
 
 function createChart() {
-	const year = graphic.selectAll('.year')
+	const year = chart.selectAll('.year')
 		.data(dataByDecade)
 		.enter().append('div')
 			.attr('class', 'year')
@@ -198,10 +200,10 @@ function createChart() {
 		.attr('class', 'text__description')
 		.text(d => `Tk description here.`)
 
-	const chart = year.append('div')
+	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
 
-	const svg = chart.append('svg')
+	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
 
 	const g = svg.append('g')
@@ -234,7 +236,7 @@ function createChart() {
 }
 
 function createKey() {
-	const key = graphic.append('div')
+	const key = chart.append('div')
 		.attr('class', 'chart__key')
 
 	const data = Object.keys(categoryColors)
@@ -250,7 +252,7 @@ function handleSearchChange() {
 	let name = this.value ? this.value.toLowerCase() : ''
 	name = name.length > 2 ? name : null
 
-	graphic.selectAll('.item')
+	chart.selectAll('.item')
 		.classed('is-player', false)
 		.filter(d => d.players.toLowerCase().includes(name))
 		.classed('is-player', true)
@@ -259,7 +261,7 @@ function handleSearchChange() {
 function setupScales() {
 	scale.position
 		.domain(d3.range(0, NUM_VIDEOS))
-		.padding(0.2)
+		.padding(0)
 
 	scale.size = decades.map((d, i) => {
 		const max = d3.max(dataByDecade[i].value, x => x.agg_view_count)
@@ -287,29 +289,30 @@ function updateScales() {
 
 function resize() {
 	Youtube.resize()
-	const svg = graphic.selectAll('.chart__svg')
-	const chart = graphic.select('.year__chart')
-	const w = chart.node().offsetWidth
+	const svg = chart.selectAll('.chart__svg')
+	const yearChart = chart.selectAll('.year__chart')
+	const w = yearChart.node().offsetWidth
 	const h = Math.floor(w / RATIO)
 
 	chartWidth = w - MARGIN.left - MARGIN.right
 	chartHeight = h - MARGIN.top - MARGIN.bottom
 
+	const outerWidth = chartWidth + MARGIN.left + MARGIN.right
+	const outerHeight = chartHeight + MARGIN.top + MARGIN.bottom
 	updateScales()
 
-	chart
-		.style('width', `${chartWidth}px`)
-		.style('height', `${chartHeight}px`)
+	yearChart
+		.style('width', `${outerWidth}px`)
+		.style('height', `${outerHeight}px`)
 
 	svg
-		.style('width', chartWidth + MARGIN.left + MARGIN.right)
-		.style('height', chartHeight + MARGIN.top + MARGIN.bottom)
+		.style('width', outerWidth)
+		.style('height', outerHeight)
 
 	svg.select('g')
 		.attr('transform', `translate(${MARGIN.left}, ${MARGIN.top})`)
 
 	const x = scale.position.bandwidth()
-	const minHeight = 10
 
 	svg.selectAll('.item rect')
 		.attr('width', x)
@@ -326,6 +329,32 @@ function resize() {
 		})
 }
 
+function setupScroll() {
+	const controller = new ScrollMagic.Controller()
+
+	const el = d3.select('.graphic')
+
+	const enterExitScene = new ScrollMagic.Scene({
+		triggerElement: el.node(),
+		triggerHook: '0',
+		duration: el.node().offsetHeight - video.node().offsetHeight,
+	})
+
+	enterExitScene
+		.on('enter', function(event) {
+			console.log('enter')
+			video.classed('is-fixed', true)
+			const bottom = event.scrollDirection === 'REVERSE'
+			if (bottom) video.classed('is-bottom', false)
+		})
+		.on('leave', function(event) {
+			console.log('exit')
+			video.classed('is-fixed', false)
+			const bottom = event.scrollDirection === 'FORWARD'
+			if (bottom) video.classed('is-bottom', true)
+		})
+	enterExitScene.addTo(controller)
+}
 
 function setup() {
 	setupScales()
@@ -335,6 +364,7 @@ function setup() {
 	setupTitles()
 	setupSearch()
 	resize()
+	setupScroll()
 	return Promise.resolve()
 }
 

@@ -17,6 +17,8 @@ function resize() {
 		const width = graphic.select('.year__video').node().offsetWidth
 		const height = Math.floor(width / RATIO)
 		player.setSize(width, height)
+		// const offset = (window.innerHeight - height) / 4
+		// graphic.style('padding-top', `${offset}px`)
 	}
 }
 

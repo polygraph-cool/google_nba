@@ -46,17 +46,19 @@
 		width 100%
 
 	.item
-		height 1.25rem
+		// height 1.25rem
 		cursor pointer
-		position relative
-		background-color $gray-light
-		border-right 1px solid #fff
+		stroke #fff
+		fill $gray-light
+		// position relative
+		// background-color $gray-light
+		// border-right 1px solid #fff
 		&.is-active
-			background-color $gray-dark
+			fill $gray-dark
 		&.is-player
-			background-color #207bc0
+			fill #207bc0
 		&:hover
-			background-color $gray
+			fill $gray
 
 	.plays__annotation
 		width 100%
