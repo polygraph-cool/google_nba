@@ -27,7 +27,7 @@
 	.year__text
 		display flex
 		align-items center
-		padding-bottom 3rem
+		padding-bottom 5rem
 		justify-content space-between
 
 	.text__label
@@ -90,6 +90,17 @@
 		border 1px solid $off-black
 		border-radius 5px
 		background #fff
+		&:before
+			content 'Click to play'
+			display block
+			text-transform uppercase
+			position absolute
+			transform translate(-0.5rem, -225%)
+			font-size 0.6rem
+			color $gray
+			font-weight 500
+			
+			 
 		&.is-visible
 			visibility visible
 
