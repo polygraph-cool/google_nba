@@ -12,7 +12,7 @@ let chartWidth = 0
 let chartHeight = 0
 const graphic = d3.select('.graphic')
 const chart = graphic.select('.graphic__chart')
-const video = graphic.select('.graphic__video')
+const sticky = graphic.select('.graphic__sticky')
 
 const scale = { position: d3.scaleBand(), size: null }
 const NUM_VIDEOS = 100
@@ -406,21 +406,30 @@ function setupScroll() {
 	const enterExitScene = new ScrollMagic.Scene({
 		triggerElement: el.node(),
 		triggerHook: '0',
-		duration: el.node().offsetHeight - video.node().offsetHeight,
+		duration: el.node().offsetHeight - sticky.node().offsetHeight,
 	})
 
 	enterExitScene
 		.on('enter', function(event) {
-			console.log('enter')
-			video.classed('is-fixed', true)
+			const bb = sticky.node().getBoundingClientRect()
+			const right = d3.select('main').node().offsetWidth - bb.right
+
+			sticky
+				.classed('is-fixed', true)
+				.style('right', `${right}px`)
+				.style('width', `${bb.width}px`)
+
 			const bottom = event.scrollDirection === 'REVERSE'
-			if (bottom) video.classed('is-bottom', false)
+			if (bottom) sticky.classed('is-bottom', false)
 		})
 		.on('leave', function(event) {
-			console.log('exit')
-			video.classed('is-fixed', false)
+
+			sticky
+				.classed('is-fixed', false)
+				.style('right', '0')
+				.style('width', '45%')
 			const bottom = event.scrollDirection === 'FORWARD'
-			if (bottom) video.classed('is-bottom', true)
+			if (bottom) sticky.classed('is-bottom', true)
 		})
 	enterExitScene.addTo(controller)
 }
