@@ -101,8 +101,8 @@ function displayTitle({ decade, index, reset }) {
 	const detail = year.select('.year__detail')
 
 	detail.select('.text__title').text(d.title)
-	detail.select('.text__date').text(d.date)
-	detail.select('.text__views').text(`${d.views} views`)
+	detail.select('.text__date').text(d.date + ' - ' + `${d.views} views`)
+	detail.select('.text__views').text()
 
 	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
 
@@ -248,7 +248,7 @@ function createChart() {
 	// 		const first = d.value[0]
 	// 		return `${first.title} ${first.views} views`
 	// 	})
-		
+
 }
 
 function createKey() {
