@@ -5,6 +5,24 @@
 	.year__chart
 		position relative
 		margin-bottom 4rem
+		
+		&:before
+			content '#1'
+			font-size 0.6rem
+			font-weight bold
+			display block
+			position absolute
+			bottom 0
+			left $graphic-margin
+
+		&:after
+			content '#100'
+			font-size 0.6rem
+			font-weight bold
+			display block
+			position absolute
+			bottom 0
+			right $graphic-margin
 
 	.year__text
 		display flex
@@ -14,14 +32,12 @@
 
 	.text__label
 		width auto
-		padding-right 1rem
-		padding-left 1rem
+		padding 0 1rem
 		font-size 2.5rem
 		text-transform capitalize
 		font-weight 300
-		margin-right .5rem
-		align-self flex-end
 		line-height 2.8rem
+		align-self flex-end
 
 	.text__description
 		font-size 0.8rem
@@ -30,23 +46,22 @@
 		width 18rem
 		align-self flex-end
 
-	.plays__detail
-		width 100%
-		display block
-		height 1rem
-
-	.plays__items
-		display flex
-		width 100%
-
+	.axis__label
+		text
+			font-size 0.7rem
+			fill $gray
+		line 
+			stroke lighten($gray, 20)
+			stroke-width 0.5px
+			stroke-dasharray 4px 4px
 	.item
 		cursor pointer
 		stroke #fff
 		fill $gray-light
 		&.is-active
-			fill $gray-dark
+			fill $red
 		&.is-player
-			fill #207bc0
+			fill $blue
 		&:hover
 			fill $gray
 

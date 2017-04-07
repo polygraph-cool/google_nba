@@ -44,9 +44,12 @@ function onPlayerReady({ target }) {
 	Graphic.jumpToPlay(target)
 }
 
-function updateTitle({ decadeIndex, title }) {
-	graphic.select('.label__year').text(dataByDecade[decadeIndex].key)
+function updateTitle({ decadeIndex, title, date, views, index }) {
+	// graphic.select('.label__year').text(dataByDecade[decadeIndex].key)
+	graphic.select('.label__index').text(`#${index + 1}`)
 	graphic.select('.label__title').text(title)
+	graphic.select('.meta__date').text(date)
+	graphic.select('.meta__views').text(` - ${views} views`)
 }
 
 function jumpTo({ decadeIndex, videoIndex }) {
@@ -108,12 +111,23 @@ function setup(data) {
 	.append('div')
 		.attr('id', 'player')
 
-	const label = graphic.append('p')
+	const year = graphic.append('p')
 		.attr('class', 'year__label')
-	label.append('span')
+
+	year.append('span')
+		.attr('class', 'label__index')
+	year.append('span')
 		.attr('class', 'label__year')
-	label.append('span')
+	year.append('span')
 		.attr('class', 'label__title')
+
+	const meta = graphic.append('div')
+		.attr('class', 'meta__label')
+
+	meta.append('span')
+		.attr('class', 'meta__date')
+	meta.append('span')
+		.attr('class', 'meta__views')
 
 	setupPlayer()
 	resize()

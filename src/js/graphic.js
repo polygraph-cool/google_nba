@@ -4,7 +4,6 @@ import ScrollMagic from 'scrollmagic'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 
-let rawData = null
 let dataByDecade = null
 let decades = null
 
@@ -51,6 +50,7 @@ function cleanData(row) {
 		agg_view_count: +row.agg_view_count,
 		title: row.title_custom,
 		date: formatDate(row.date),
+		views: formatViews(row.agg_view_count),
 		decade_display: row.decade === '2017' ? 'this season' : `${row.decade}s`,
 	}
 }
@@ -69,7 +69,6 @@ function loadData() {
 		d3.csv('assets/curated_merged_by_decade.csv', cleanData, (err, data) => {
 			if (err) reject(err)
 			else {
-				rawData = data
 				dataByDecade = d3.nest()
 					.key(d => d.decade_display).sortKeys(d3.descending)
 					.rollup(rollupDecade)
@@ -98,12 +97,11 @@ function displayTitle({ decade, index, reset }) {
 	const pos = scale.position(index) + MARGIN.left
 	const x = right ? w - pos : pos
 	const y = chartHeight - scale.size[decade](d.agg_view_count)
-	const views = formatViews(d.agg_view_count)
 
 	const detail = year.select('.year__detail')
 
 	detail.select('.detail__text')
-		.text(`${d.date}: ${d.title} (${views} views)`)
+		.text(`${d.date}: ${d.title} (${d.views} views)`)
 
 	detail
 		.style('left', right ? 'auto' : `${x}px`)
@@ -131,7 +129,7 @@ function jumpToPlay({ decadeIndex, videoIndex }) {
 
 	// update label
 	const d = dataByDecade[decadeIndex].value[videoIndex]
-	Youtube.updateTitle({ decadeIndex, title: d.title })
+	Youtube.updateTitle({ decadeIndex, ...d })
 	displayTitle({ decade: decadeIndex, index: videoIndex, reset: true })
 }
 
@@ -140,7 +138,7 @@ function handlePlayClick(d, i) {
 	Youtube.jumpTo({ decadeIndex, videoIndex: i })
 
 	// update label
-	Youtube.updateTitle({ decadeIndex, title: d.title })
+	Youtube.updateTitle({ decadeIndex, ...d })
 
 	// deactive other plays
 	d3.select(this.parentNode).selectAll('.item')
@@ -188,13 +186,6 @@ function createAnnotation(d) {
 }
 
 function createChart() {
-
-	chart.append("div")
-		.attr("class","border-top")
-		.append("p")
-		.attr("class","border-top-text")
-		.text("Explore Plays")
-
 	const year = chart.selectAll('.year')
 		.data(dataByDecade)
 		.enter()
@@ -221,6 +212,9 @@ function createChart() {
 	const g = svg.append('g')
 		.attr('class', 'g-graphic')
 
+	g.append('g')
+		.attr('class', 'g-axis')
+
 	const items = g.append('g')
 		.attr('class', 'g-items')
 		.on('mouseleave', handlePlayExit)
@@ -242,8 +236,7 @@ function createChart() {
 		.attr('class', 'detail__text')
 		.text((d) => {
 			const first = d.value[0]
-			const views = formatViews(first.agg_view_count)
-			return `${first.title} ${views} views`
+			return `${first.title} ${first.views} views`
 		})
 }
 
@@ -299,19 +292,51 @@ function updateScales() {
 	scale.size.forEach(s => s.range([0, chartHeight]))
 }
 
-function resize() {
-	Youtube.resize()
+function updateAxis() {
 	const svg = chart.selectAll('.chart__svg')
-	const yearChart = chart.selectAll('.year__chart')
-	const w = yearChart.node().offsetWidth
-	const h = Math.floor(w / RATIO)
+	const percentiles = [0.33, 0.66, 1]
+	svg.each(function(datum, decade) {
+		const values = percentiles.map((p) => {
+			const h = chartHeight * p
+			const views = formatViews(scale.size[decade].invert(h))
+			return { pos: chartHeight - h, views }
+		})
+		const axis = d3.select(this).select('.g-axis')
 
-	chartWidth = w - MARGIN.left - MARGIN.right
-	chartHeight = h - MARGIN.top - MARGIN.bottom
+		axis.attr('transform', `translate(${chartWidth}, 0)`)
 
+		const label = axis.selectAll('.label')
+			.data(values)
+
+		const enter = label.enter().append('g')
+			.attr('class', 'axis__label')
+
+		const line = enter.append('line')
+
+		line
+			.attr('x1', 0)
+			.attr('y1', 0)
+			.attr('x2', -chartWidth)
+			.attr('y2', 0)
+
+		const text = enter.append('text')
+
+		text
+			.attr('text-anchor', 'end')
+			.attr('alignment-baseline', 'baseline')
+			.attr('dy', -2)
+			.text((d, i) => `${d.views} ${i === 2 ? 'views' : ''}`)
+
+		enter.merge(label)
+			.attr('transform', d => `translate(0, ${d.pos})`)
+	})
+}
+
+function updateChartElements() {
 	const outerWidth = chartWidth + MARGIN.left + MARGIN.right
 	const outerHeight = chartHeight + MARGIN.top + MARGIN.bottom
-	updateScales()
+	const svg = chart.selectAll('.chart__svg')
+	const yearChart = chart.selectAll('.year__chart')
 
 	yearChart
 		.style('width', `${outerWidth}px`)
@@ -339,6 +364,19 @@ function resize() {
 			const v = chartHeight - scale.size[index](d.agg_view_count)
 			return v
 		})
+}
+function resize() {
+	Youtube.resize()
+	const yearChart = chart.selectAll('.year__chart')
+	const w = yearChart.node().offsetWidth
+	const h = Math.floor(w / RATIO)
+
+	chartWidth = w - MARGIN.left - MARGIN.right
+	chartHeight = h - MARGIN.top - MARGIN.bottom
+
+	updateScales()
+	updateAxis()
+	updateChartElements()
 }
 
 function setupScroll() {
