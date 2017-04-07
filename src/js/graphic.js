@@ -3,6 +3,7 @@ import 'promis'
 import ScrollMagic from 'scrollmagic'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
+import Text from './text'
 
 let dataByDecade = null
 let decades = null
@@ -96,26 +97,23 @@ function displayTitle({ decade, index, reset }) {
 	const right = index > NUM_VIDEOS / 2
 	const pos = scale.position(index) + MARGIN.left
 	const x = right ? w - pos : pos
-	const y = chartHeight - scale.size[decade](d.agg_view_count)
-
+	const y = scale.size[decade](d.agg_view_count) + MARGIN.bottom * 1.25
 	const detail = year.select('.year__detail')
 
-	detail.select('.detail__text')
-		.text(`${d.date}: ${d.title} (${d.views} views)`)
+	detail.select('.text__title').text(d.title)
+	detail.select('.text__date').text(d.date)
+	detail.select('.text__views').text(`${d.views} views`)
+
+	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
+
+	detail.select('.detail__thumbnail')
+		.style('background-image', `url("${url}")`)
 
 	detail
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
-		.style('top', `${y}px`)
+		.style('bottom', `${y}px`)
 		.classed('is-visible', true)
-
-	// const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
-
-	// year.select('.annotation__thumbnail')
-	// 	.style('background-image', `url("${url}")`)
-	// 	.style('left', right ? 'auto' : `${x}px`)
-	// 	.style('right', right ? `${x}px` : 'auto')
-	// 	.classed('is-visible', !reset)
 }
 
 function jumpToPlay({ decadeIndex, videoIndex }) {
@@ -201,7 +199,11 @@ function createChart() {
 
 	text.append('p')
 		.attr('class', 'text__description')
-		.text(d => `Of the top 100 plays this season, Curry has 18 and Westbrook 20.`)
+		.text((d, i) => Text[i].description)
+
+	year.append('p')
+		.attr('class', 'year__title')
+		.text((d, i) => `Plays ranked by Youtube views, ${Text[i].era}`)
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
@@ -232,12 +234,21 @@ function createChart() {
 	const detail = yearChart.append('div')
 		.attr('class', 'year__detail')
 
-	detail.append('p')
+	detail.append('div')
+		.attr('class', 'detail__thumbnail')
+
+	const detailText = detail.append('p')
 		.attr('class', 'detail__text')
-		.text((d) => {
-			const first = d.value[0]
-			return `${first.title} ${first.views} views`
-		})
+
+	detailText.append('span').attr('class', 'text__title')
+	detailText.append('span').attr('class', 'text__date')
+	detailText.append('span').attr('class', 'text__views')
+
+	// .text((d) => {
+	// 		const first = d.value[0]
+	// 		return `${first.title} ${first.views} views`
+	// 	})
+		
 }
 
 function createKey() {
@@ -282,8 +293,16 @@ function setupSearch() {
 }
 
 function setupTitles() {
-	dataByDecade.forEach((d, i) => {
-		displayTitle({ decade: i, index: 0, reset: true })
+	dataByDecade.forEach((decade, decadeIndex) => {
+		const year = chart.selectAll('.year')
+			.filter((d, i) => i === decadeIndex)
+
+		year.selectAll('.item')
+			.classed('is-active', false)
+			.filter((d, i) => i === 0)
+				.classed('is-active', true)
+
+		displayTitle({ decade: decadeIndex, index: 0, reset: true })
 	})
 }
 
@@ -410,10 +429,10 @@ function setup() {
 	setupScales()
 	Youtube.setup(dataByDecade)
 	createChart()
-	// createKey()
-	setupTitles()
-	setupSearch()
 	resize()
+	// createKey()
+	setupSearch()
+	setupTitles()
 	setupScroll()
 	return Promise.resolve()
 }

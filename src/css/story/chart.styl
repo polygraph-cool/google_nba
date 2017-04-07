@@ -13,7 +13,7 @@
 			display block
 			position absolute
 			bottom 0
-			left $graphic-margin
+			left $chart-margin
 
 		&:after
 			content '#100'
@@ -22,7 +22,7 @@
 			display block
 			position absolute
 			bottom 0
-			right $graphic-margin
+			right $chart-margin
 
 	.year__text
 		display flex
@@ -38,6 +38,14 @@
 		font-weight 300
 		line-height 2.8rem
 		align-self flex-end
+		&:before
+			content 'Most-viewed plays'
+			display block
+			font-size 0.8rem
+			text-transform uppercase
+			color $gray
+			font-weight 400
+			line-height 1.5
 
 	.text__description
 		font-size 0.8rem
@@ -45,6 +53,13 @@
 		font-weight 300
 		width 18rem
 		align-self flex-end
+	
+	.year__title
+		text-align right
+		color $gray-dark
+		font-size 0.8rem
+		padding-bottom 0.5rem
+		padding-right $chart-margin
 
 	.axis__label
 		text
@@ -65,44 +80,44 @@
 		&:hover
 			fill $gray
 
-	.plays__annotation
-		width 100%
-		position relative
-	.annotation__thumbnail
-		display none
-		width 20%
-		height 500%
+	.year__detail
 		position absolute
-		top 0
+		bottom 0
 		left 0
-		transform translateY(-86%)
+		width 15rem
+		display flex
+		padding 0.5rem
+		border 1px solid $off-black
+		border-radius 5px
+		background #fff
+		&.is-visible
+			visibility visible
+
+	.detail__text
+		width 60%
+		font-size 0.65rem
+		font-weight 700
+		line-height 1.2
+		padding 0 1em
+		span 
+			display block
+			padding-bottom 0.25em
+		.text__date
+			color $gray-dark
+			font-weight 400
+		.text__views
+			display inline-block
+			color $red
+			font-weight 700
+		
+	.detail__thumbnail
+		width 40%
+		height 4rem
 		z-index set-index('overlay')
 		background-color black
 		background-repeat no-repeat
 		background-position center center
 		background-size cover
-		&.is-visible
-			display block
-
-	.annotation__text
-		color #7d7d7d
-		font-weight 600
-		text-transform uppercase
-		font-size 0.6rem
-		visibility hidden
-
-	.year__detail
-		position absolute
-		top 0
-		left 0
-		&.is-visible
-			visibility visible
-
-	.detail__text
-		font-size 0.65rem
-		font-weight bold
-		line-height 1.25
-		text-shadow 0 0 3px white
 
 	.chart__key
 		display flex

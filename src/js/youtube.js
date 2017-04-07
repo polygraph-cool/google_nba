@@ -2,7 +2,7 @@ import * as d3 from 'd3'
 import Graphic from './graphic'
 
 let ready = false
-let initialAutoplay = false
+// let initialAutoplay = false
 let player = null
 const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
@@ -37,10 +37,10 @@ function loadScript() {
 }
 
 function onPlayerReady({ target }) {
-	if (!initialAutoplay) {
-		initialAutoplay = true
-		target.playVideo()
-	}
+	// if (!initialAutoplay) {
+	// 	initialAutoplay = true
+	// 	target.playVideo()
+	// }
 	Graphic.jumpToPlay(target)
 }
 
