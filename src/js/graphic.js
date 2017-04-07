@@ -188,10 +188,18 @@ function createAnnotation(d) {
 }
 
 function createChart() {
+
+	chart.append("div")
+		.attr("class","border-top")
+		.append("p")
+		.attr("class","border-top-text")
+		.text("Explore Plays")
+
 	const year = chart.selectAll('.year')
 		.data(dataByDecade)
-		.enter().append('div')
-			.attr('class', 'year')
+		.enter()
+		.append('div')
+		.attr('class', 'year')
 
 	const text = year.append('div')
 		.attr('class', 'year__text')
@@ -202,7 +210,7 @@ function createChart() {
 
 	text.append('p')
 		.attr('class', 'text__description')
-		.text(d => `What is the most watch NBA video of all-time? We identified over 200,000 NBA videos.`)
+		.text(d => `Of the top 100 plays this season, Curry has 18 and Westbrook 20.`)
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
