@@ -34,23 +34,14 @@
 
 	.text__label
 		width 100%
-		padding .5rem 1rem .7rem
+		padding 0.5rem 1rem
 		font-size 2.6rem
 		text-transform capitalize
 		font-weight 100
 		line-height 2.8rem
-		letter-spacing -.02em
+		letter-spacing -0.02em
 		color black
 		align-self flex-end
-		&:before
-			content ''
-			display block
-			font-size 0.6rem
-			text-transform uppercase
-			color $gray
-			font-weight 500
-			line-height 1.5
-			letter-spacing .04em
 
 	.text__description
 		padding 0 1rem
@@ -59,22 +50,20 @@
 		font-weight 400
 		width 100%
 		align-self flex-end
-		color black
-		color rgba(0,0,0,.8)
+		$off-black
 
 	.year__title
 		text-align center
-		padding 0px
 		line-height	1.5
 		color $off-black
 		font-size 0.65em
+		position absolute
+		top 0.3rem
+		left 0
+		width 100%
 		text-transform uppercase
-		font-weight 900
+		font-weight bold
 		padding-right $chart-margin
-		color black
-		margin-bottom -2.2rem
-
-
 
 	.axis__label
 		text
@@ -105,47 +94,48 @@
 
 	.year__detail
 		position absolute
-		bottom 0
-		left 0
 		width 5.5rem
-		display flex
-		flex-wrap wrap
-		border 1px solid #fff
-		border-radius 5px
-		background #fff
-		box-shadow 0 0 0.5rem #fff
 		pointer-events none
-		visibility hidden
-		&.is-visible
+		opacity 0
+		z-index set-index('overlay')
+		&:before
+			content ' '
+			height 0
+			width 0
+			position absolute
+			border 4px solid transparent
+			border-bottom-color $off-black
+			position absolute
+			bottom 0
+			left 0
+			transform translateY(150%) rotate(180deg)
 			visibility visible
-
-	.detail__text
-		width 65%
-		order 2
-		font-size 0.9rem
-		font-weight 700
-		line-height 1.2
-		color black
-		span
-			display block
-			padding-bottom 0.25rem
-			color $gray-dark
-			font-weight 400
-		.text__title
-			display block
-			color black
-			font-weight 500
-			font-size .75rem
+		&:after
+			content ' '
+			height 0
+			width 0
+			position absolute
+			border 4px solid transparent
+			border-bottom-color $off-black
+			position absolute
+			bottom 0
+			right 0
+			transform translateY(150%) rotate(180deg)
+			visibility hidden
+		&.is-right:before
+			visibility hidden
+		&.is-right:after
+			visibility visible
+		&.is-visible
+			opacity 1
 	
 	.detail__thumbnail
 		width 100%
 		height 3rem
-		z-index set-index('overlay')
-		background-color black
+		background-color $off-black
 		background-repeat no-repeat
 		background-position center center
 		background-size cover
-		order 2
 
 
 	.year__annotation
@@ -153,7 +143,7 @@
 		z-index set-index('overlay')
 		position relative
 		transform translateY(-1.5rem)
-		visibility hidden
+		visibility none
 		&.is-visible
 			visibility visible
 	.annotation__text
@@ -167,11 +157,34 @@
 			padding-bottom 0.2rem
 			font-weight 400
 		.text__arrow
-			transform rotate(180deg)
-			text-align right
-			color $gray-dark
-			line-height	1
-			margin-bottom .2rem
+			height 1rem
+			&:before
+				content ' '
+				height 0
+				position absolute
+				width 0
+				border 4px solid transparent
+				border-bottom-color $off-black
+				position absolute
+				top 0
+				left 0
+				visibility visible
+			&:after
+				content ' '
+				height 0
+				position absolute
+				width 0
+				border 4px solid transparent
+				border-bottom-color $off-black
+				position absolute
+				top 0
+				right 0
+				transform translateX(4px)
+				visibility hidden
+		&.is-right .text__arrow:before
+			visibility hidden
+		&.is-right .text__arrow:after
+			visibility visible
 		.text__click
 			font-size 0.75em
 			text-transform uppercase

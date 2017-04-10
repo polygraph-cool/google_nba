@@ -91,20 +91,19 @@ function displayTitle({ decade, index, reset }) {
 
 	const w = year.node().offsetWidth
 	const right = index > NUM_VIDEOS / 2
-	const pos = scale.position(index) + MARGIN.left - scale.position.bandwidth()/4
-	const x = right ? w - pos : pos
+	const pos = scale.position(index) + MARGIN.left - scale.position.bandwidth() / 4
+	const x = right ? w - pos - 4 : pos
 
 	const annotation = year.select('.year__annotation')
 	const annotationText = annotation.select('.annotation__text')
 	annotationText.select('.text__title').text(datum.title)
 	annotationText.select('.text__date').text(`${datum.date} - ${datum.views} views`)
 
-	console.log();
-
 	annotationText
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.style('text-align', right ? 'right' : 'left')
+		.classed('is-right', right)
 		.classed('is-visible', true)
 
 	// const current = Youtube.getCurrent()
@@ -119,9 +118,9 @@ function updateDetail({ decade, index }) {
 
 	const w = year.node().offsetWidth
 	const right = index > NUM_VIDEOS / 2
-	const pos = scale.position(index) + MARGIN.left - 3
-	const x = right ? w - pos : pos
-	const y = scale.size[decade](datum.agg_view_count) + MARGIN.bottom * 1.25 - 5
+	const pos = scale.position(index) + MARGIN.left - scale.position.bandwidth() / 4
+	const x = right ? w - pos - 8 : pos
+	const y = scale.size[decade](datum.agg_view_count) + MARGIN.bottom * 1.6
 
 	const detail = year.select('.year__detail')
 
@@ -144,6 +143,7 @@ function updateDetail({ decade, index }) {
 		.style('left', right ? 'auto' : `${x}px`)
 		.style('right', right ? `${x}px` : 'auto')
 		.style('bottom', `${y}px`)
+		.classed('is-right', right)
 		.classed('is-visible', true)
 }
 
@@ -236,15 +236,15 @@ function createChart() {
 		.attr('class', 'text__description')
 		.text((d, i) => Text[i].description)
 
-	year.append('p')
-		.attr('class', 'year__title')
-		.html((d, i) => `Moments ranked by<br>YouTube views, ${Text[i].era}`)
-
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
 
 	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
+
+	yearChart.append('p')
+		.attr('class', 'year__title')
+		.html((d, i) => `Moments ranked by<br>YouTube views, ${Text[i].era}`)
 
 	const g = svg.append('g')
 		.attr('class', 'g-graphic')
@@ -276,20 +276,13 @@ function createChart() {
 	detail.append('div')
 		.attr('class', 'detail__thumbnail')
 
-	const detailText = detail.append('p')
-		.attr('class', 'detail__text')
-		.text("▾")
-
-	// detailText.append('span').attr('class', 'text__title')
-	// detailText.append('span').attr('class', 'text__date')
-
 	const annotation = yearChart.append('div')
 		.attr('class', 'year__annotation')
 
 	const annotationText = annotation.append('p')
 		.attr('class', 'annotation__text')
 
-	annotationText.append('span').attr('class', 'text__arrow').text("▾")
+	annotationText.append('span').attr('class', 'text__arrow')
 
 	annotationText.append('span').attr('class', 'text__click')
 		.text('Click to play')
