@@ -10,11 +10,25 @@
 		</div>
 		<div class='graphic__video'></div>
 		<div class='graphic__ui'>
+			<div class='ui__category'>
+				<p class='category__label ui-label'>Filter play type:</p>
+				<ul class='category__options'>
+					<li>Dunk</li>
+					<li>Game-winner</li>
+					<li>Block</li>
+				</ul>
+			</div>
+			<div class='ui__team'>
+				<p class='team__label ui-label'>Filter team:</p>
+				<select class='team__options'>
+					<option>All</option>
+				</select>
+			</div>
 			<div class='ui__search'>
-				<p class='search__label'>Search</p>
 				<div class='search__input'>
-					<input placeholder='Player...'>
+					<input placeholder='Player name...'>
 				</div>
+				<div class='search__label'>@@include('search.svg')</div>
 			</div>
 		</div>
 	</div>

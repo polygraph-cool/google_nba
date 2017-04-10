@@ -1,35 +1,56 @@
 .graphic__ui
+	width 100%
 	margin 0 auto
 	padding 1rem 0
+	display flex
+	flex-wrap wrap
+	justify-content space-between
 
+	.ui-label
+		color $gray
+		font-size 0.7rem
 	.ui__search
+		margin 1rem auto
 		display flex
-	
-	.search__label
-		font-size 0.8rem
-		margin-right 0.5em
-		text-transform uppercase
-		font-weight bold
-		letter-spacing 0.05em
-		line-height 1.5
+		flex-wrap wrap
+		justify-content center
 	
 	.search__input
-		display block
-		position relative
-		&:before
-			content ''
-			width 0.5rem
-			height 100%
-			display inline-block
-			position absolute
-			top 0
-			left 0
-			background-color $blue
 		input
 			width 8rem
 			border none
 			border-bottom 1px solid $off-black
 			font-size 0.8rem
 			color $gray-dark
-			margin-left 1.5rem
 			line-height 1.5
+	
+	.search__label
+		margin-left 0.5rem
+		svg
+			vertical-align baseline
+			transform translateY(25%)
+			width 1rem
+			height 1.25rem
+			fill $gray-dark
+
+	.ui__category 
+		flex-grow 2
+	.category__options
+		display flex
+		li 
+			margin 0.25em 0
+			padding 0.25em 0.5em
+			font-size 0.8rem
+			border-top 1px solid $gray
+			border-right 1px solid $gray
+			border-bottom 1px solid $gray
+			background-color white
+			&.is-selected
+				background-color $gray
+			&:first-child
+				border-left 1px solid $gray
+				border-bottom-left-radius 3px
+				border-top-left-radius 3px
+			&:last-child
+				border-bottom-right-radius 3px
+				border-top-right-radius 3px
