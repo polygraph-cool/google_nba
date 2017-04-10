@@ -263,6 +263,10 @@ function createChart() {
 		.on('mouseenter', handlePlayEnter)
 
 	item.append('rect')
+		.attr('class', 'item__bar')
+
+	item.append('rect')
+		.attr('class', 'item__interact')
 
 	const detail = yearChart.append('div')
 		.attr('class', 'year__detail')
@@ -409,7 +413,7 @@ function updateChartElements() {
 
 	const x = scale.position.bandwidth()
 
-	svg.selectAll('.item rect')
+	svg.selectAll('.item__bar')
 		.attr('width', x)
 		.attr('height', (d) => {
 			const index = decadeToIndex(d.decade_display)
@@ -422,6 +426,12 @@ function updateChartElements() {
 			const v = chartHeight - scale.size[index](d.agg_view_count)
 			return v
 		})
+
+	svg.selectAll('.item__interact')
+		.attr('width', x)
+		.attr('height', chartHeight)
+		.attr('x', d => scale.position(d.index))
+		.attr('y', 0)
 }
 function resize() {
 	Youtube.resize()

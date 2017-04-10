@@ -79,17 +79,23 @@
 			stroke-width 0.5px
 			stroke-dasharray 4px 4px
 	.item
-		cursor pointer
+		&.is-selected .item__bar
+			fill $gray
+		&.is-playing .item__bar
+			fill $red
+		&.is-player .item__bar
+			fill $blue
+		&:hover .item__bar
+			fill $gray
+		
+	.item__bar
 		stroke #fff
 		fill $gray-light
-		&.is-selected
-			fill $gray
-		&.is-playing
-			fill $red
-		&.is-player
-			fill $blue
-		&:hover
-			fill $gray
+		pointer-events none
+	
+	.item__interact
+		cursor pointer
+		opacity 0
 
 	.year__detail
 		position absolute
