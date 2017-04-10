@@ -230,7 +230,7 @@ function createChart() {
 
 	text.append('p')
 		.attr('class', 'text__description')
-		.text((d, i) => Text[i].description)
+		.html((d, i) => Text[i].description)
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')

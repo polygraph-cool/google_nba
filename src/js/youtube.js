@@ -48,7 +48,7 @@ function onPlayerReady({ target }) {
 function updateTitle({ decade_display, title, date, views, index }) {
 	let pre = ''
 	if (decade_display.endsWith('s')) pre = 'in the '
-	else if (decade_display === '2010-2015') pre = 'in '
+	else pre = 'in '
 	graphic.select('.label__decade').text(`#${index + 1} ${pre}${decade_display}`)
 	graphic.select('.label__index').text(``)
 	graphic.select('.label__title').text(title)

@@ -34,7 +34,7 @@
 
 	.text__label
 		width 100%
-		padding 0.5rem 1rem
+		padding 0.5rem 1rem 1rem
 		font-size 2.6rem
 		text-transform capitalize
 		font-weight 100
@@ -45,12 +45,28 @@
 
 	.text__description
 		padding 0 1rem
-		font-size 0.9rem
-		line-height 1.6
+		font-size 0.75rem
+		line-height 1.7
 		font-weight 400
 		width 100%
 		align-self flex-end
-		$off-black
+		color $off-black
+		span
+			color $blue
+			background linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient($blue,$blue)
+			background-size .05em 1px,.05em 1px,1px 1px
+			background-repeat no-repeat,no-repeat,repeat-x
+			text-shadow 0.03em 0 #fff, -0.03em 0 #fff, 0 0.03em #fff, 0 -0.03em #fff, 0.06em 0 #fff, -0.06em 0 #fff, 0.09em 0 #fff, -0.09em 0 #fff, 0.12em 0 #fff, -0.12em 0 #fff, 0.15em 0 #fff, -0.15em 0 #fff
+			background-position	0 95%,100% 95%,0 95%
+			cursor pointer
+			&:hover
+				color black
+				background linear-gradient(#fff,#fff),linear-gradient(#fff,#fff),linear-gradient(#000,#000)
+				background-size .05em 1px,.05em 1px,1px 1px
+				background-repeat no-repeat,no-repeat,repeat-x
+				text-shadow 0.03em 0 #fff, -0.03em 0 #fff, 0 0.03em #fff, 0 -0.03em #fff, 0.06em 0 #fff, -0.06em 0 #fff, 0.09em 0 #fff, -0.09em 0 #fff, 0.12em 0 #fff, -0.12em 0 #fff, 0.15em 0 #fff, -0.15em 0 #fff
+				background-position	0 95%,100% 95%,0 95%
+
 
 	.year__title
 		text-align center
@@ -82,12 +98,12 @@
 			fill $blue
 		&:hover .item__bar
 			fill $gray
-		
+
 	.item__bar
 		stroke #fff
 		fill $gray-light
 		pointer-events none
-	
+
 	.item__interact
 		cursor pointer
 		opacity 0
@@ -128,7 +144,7 @@
 			visibility visible
 		&.is-visible
 			opacity 1
-	
+
 	.detail__thumbnail
 		width 100%
 		height 3rem
@@ -195,7 +211,9 @@
 		.text__title
 			color $off-black
 			font-weight 500
-		.text__date 
+		.text__date
 			color $gray
 			padding-bottom 0
+			font-size 0.8em
+ding-bottom 0
 			font-size 0.8em
