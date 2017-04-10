@@ -1,7 +1,8 @@
 .graphic__chart
 	width 55%
 	padding 1rem
-
+	.year
+		position relative
 	.year__chart
 		position relative
 		margin-bottom 6rem
@@ -35,7 +36,7 @@
 		padding 0 1rem
 		font-size 2rem
 		text-transform capitalize
-		font-weight 400
+		font-weight 300
 		line-height 2.8rem
 		letter-spacing -.02em
 		color black
@@ -60,14 +61,16 @@
 		color rgba(0,0,0,.8)
 
 	.year__title
-		text-align right
+		text-align center
+		padding 0px
+		line-height	1.2
 		color $off-black
-		font-size 0.6rem
+		font-size 0.8rem
 		font-weight 500
 		padding-right $chart-margin
-		letter-spacing 0.03em
 		color black
-		text-transform uppercase
+		margin-bottom -1.5rem
+
 
 
 	.axis__label
@@ -101,10 +104,10 @@
 		position absolute
 		bottom 0
 		left 0
-		width 15rem
+		width 5.5rem
 		display flex
-		padding 0.5rem
-		border 1px solid #aaa
+		flex-wrap wrap
+		border 1px solid #fff
 		border-radius 5px
 		background #fff
 		box-shadow 0 0 0.5rem #fff
@@ -115,10 +118,11 @@
 
 	.detail__text
 		width 65%
-		font-size 0.65rem
+		order 2
+		font-size 0.9rem
 		font-weight 700
 		line-height 1.2
-		padding 0 1em
+		color black
 		span
 			display block
 			padding-bottom 0.25rem
@@ -131,20 +135,21 @@
 			font-size .75rem
 	
 	.detail__thumbnail
-		width 35%
-		height 3.5rem
+		width 100%
+		height 3rem
 		z-index set-index('overlay')
 		background-color black
 		background-repeat no-repeat
 		background-position center center
 		background-size cover
+		order 2
 
 
 	.year__annotation
 		background #fff
 		z-index set-index('overlay')
 		position relative
-		transform translateY(-0.25rem)
+		transform translateY(-1.5rem)
 		visibility hidden
 		&.is-visible
 			visibility visible
@@ -158,6 +163,12 @@
 			display block
 			padding-bottom 0.2rem
 			font-weight 400
+		.text__arrow
+			transform rotate(180deg)
+			text-align right
+			color $gray-dark
+			line-height	1
+			margin-bottom .2rem
 		.text__click
 			font-size 0.75em
 			text-transform uppercase
