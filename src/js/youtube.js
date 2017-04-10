@@ -1,5 +1,6 @@
 import * as d3 from 'd3'
 import Graphic from './graphic'
+import './utils/endswith-polyfill'
 
 let ready = false
 // let initialAutoplay = false
@@ -44,9 +45,12 @@ function onPlayerReady({ target }) {
 	Graphic.jumpToPlay(target)
 }
 
-function updateTitle({ decadeIndex, title, date, views, index }) {
-	// graphic.select('.label__year').text(dataByDecade[decadeIndex].key)
-	graphic.select('.label__index').text(`#${index + 1}`)
+function updateTitle({ decade_display, title, date, views, index }) {
+	let pre = ''
+	if (decade_display.endsWith('s')) pre = 'in the '
+	else if (decade_display === '2010-2015') pre = 'in '
+	graphic.select('.label__decade').text(`#${index + 1} ${pre}${decade_display}`)
+	graphic.select('.label__index').text(``)
 	graphic.select('.label__title').text(title)
 	graphic.select('.meta__date').text(date)
 	graphic.select('.meta__views').text(` - ${views} views`)
@@ -113,6 +117,9 @@ function setup(data) {
 
 	const year = graphic.append('p')
 		.attr('class', 'year__label')
+
+	year.append('span')
+		.attr('class', 'label__decade')
 
 	year.append('span')
 		.attr('class', 'label__index')

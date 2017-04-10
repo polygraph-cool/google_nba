@@ -22,15 +22,12 @@ const RATIO = 3
 
 const currentIndex = []
 
-const categoryColors = {
-	dunk: '#e41a1c',
-	pass: '#377eb8',
-	block: '#4daf4a',
-	move: '#984ea3',
-	shot: '#ff7f00',
-	fight: '#ffff33',
-	injury: '#a65628',
-	untagged: '#ccc',
+const decadeTitles = {
+	'2017': 'this season',
+	'2010': '2010-2015',
+	'2000': '2000s',
+	'1990': '1990s',
+	'1980': '1980s',
 }
 
 function formatViews(num) {
@@ -54,7 +51,7 @@ function cleanData(row) {
 		title: row.title_custom,
 		date: formatDate(row.date),
 		views: formatViews(row.agg_view_count),
-		decade_display: row.decade === '2017' ? 'this season' : `${row.decade}s`,
+		decade_display: decadeTitles[row.decade],
 	}
 }
 
@@ -75,6 +72,7 @@ function loadData() {
 					.entries(data)
 
 				dataFlat = d3.merge(dataByDecade.map(d => d.value))
+				console.log(dataFlat[0])
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -160,7 +158,7 @@ function jumpToPlay({ decadeIndex, videoIndex }) {
 		.classed('is-playing', true)
 
 	// update label
-	Youtube.updateTitle({ decadeIndex, ...d })
+	Youtube.updateTitle({ ...d })
 	displayTitle({ decade: decadeIndex, index: videoIndex, reset: true })
 	currentIndex[decadeIndex] = videoIndex
 
@@ -172,7 +170,7 @@ function handlePlayClick(d, i) {
 	Youtube.jumpTo({ decadeIndex, videoIndex: i })
 
 	// update label
-	Youtube.updateTitle({ decadeIndex, ...d })
+	Youtube.updateTitle({ ...d })
 
 	// deactive other plays
 	chart.selectAll('.item')
@@ -301,6 +299,10 @@ function createKey() {
 		.style('background-color', d => categoryColors[d])
 }
 
+function handleResultClick(d) {
+	console.log(d)
+}
+
 function handleSearchChange() {
 	let name = this.value ? this.value.toLowerCase() : ''
 	name = name.length > 2 ? name : null
@@ -331,6 +333,7 @@ function handleSearchChange() {
 	p.append('span')
 		.attr('class', 'result__title')
 		.text(d => `${d.value.title}`)
+		.on('click', handleResultClick)
 
 	p.append('span')
 		.attr('class', 'result__meta')
