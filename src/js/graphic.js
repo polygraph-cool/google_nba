@@ -4,6 +4,7 @@ import ScrollMagic from 'scrollmagic'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 import Text from './text'
+import * as Dom from './utils/dom'
 
 let dataByDecade = null
 let dataFlat = null
@@ -72,7 +73,6 @@ function loadData() {
 					.entries(data)
 
 				dataFlat = d3.merge(dataByDecade.map(d => d.value))
-				console.log(dataFlat[0])
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -165,9 +165,9 @@ function jumpToPlay({ decadeIndex, videoIndex }) {
 	updateDetail({ decade: decadeIndex, index: videoIndex })
 }
 
-function handlePlayClick(d, i) {
+function handlePlayClick(d) {
 	const decadeIndex = decadeToIndex(d.decade_display)
-	Youtube.jumpTo({ decadeIndex, videoIndex: i })
+	Youtube.jumpTo({ decadeIndex, videoIndex: d.index })
 
 	// update label
 	Youtube.updateTitle({ ...d })
@@ -183,8 +183,8 @@ function handlePlayClick(d, i) {
 		.classed('is-playing', true)
 		.classed('is-selected', true)
 
-	currentIndex[decadeIndex] = i
-	updateDetail({ decade: decadeIndex, index: i })
+	currentIndex[decadeIndex] = d.index
+	updateDetail({ decade: decadeIndex, index: d.index })
 }
 
 function handlePlayEnter(d) {
@@ -286,21 +286,14 @@ function createChart() {
 	annotationText.append('span').attr('class', 'text__date')
 }
 
-function createKey() {
-	const key = chart.append('div')
-		.attr('class', 'chart__key')
+function handleResultClick(datum) {
+	const index = decadeToIndex(datum.value.decade_display)
+	const year = chart.selectAll('.year').filter((d, i) => i === index)
+	const el = year.node()
+	Dom.jumpTo(el)
 
-	const data = Object.keys(categoryColors)
-
-	key.selectAll('p')
-		.data(data)
-		.enter().append('p')
-		.text(d => d)
-		.style('background-color', d => categoryColors[d])
-}
-
-function handleResultClick(d) {
-	console.log(d)
+	const item = year.selectAll('.item').filter(d => d.index === datum.value.index).node()
+	handlePlayClick.call(item, datum.value)
 }
 
 function handleSearchChange() {
@@ -513,7 +506,7 @@ function setup() {
 	Youtube.setup(dataByDecade)
 	createChart()
 	resize()
-	// createKey()
+
 	setupSearch()
 	setupTitles()
 	setupScroll()
