@@ -27,22 +27,23 @@
 
 	.year__text
 		display flex
+		flex-wrap 	wrap
 		align-items center
 		padding-bottom 5rem
 		justify-content space-between
 
 	.text__label
-		width auto
-		padding 0 1rem
-		font-size 2rem
+		width 100%
+		padding .5rem 1rem .7rem
+		font-size 2.6rem
 		text-transform capitalize
-		font-weight 300
+		font-weight 100
 		line-height 2.8rem
 		letter-spacing -.02em
 		color black
 		align-self flex-end
 		&:before
-			content 'Most-viewed plays'
+			content ''
 			display block
 			font-size 0.6rem
 			text-transform uppercase
@@ -52,10 +53,11 @@
 			letter-spacing .04em
 
 	.text__description
+		padding 0 1rem
 		font-size 0.9rem
 		line-height 1.6
 		font-weight 400
-		width 18rem
+		width 100%
 		align-self flex-end
 		color black
 		color rgba(0,0,0,.8)
@@ -63,13 +65,14 @@
 	.year__title
 		text-align center
 		padding 0px
-		line-height	1.2
+		line-height	1.5
 		color $off-black
-		font-size 0.8rem
-		font-weight 500
+		font-size 0.65em
+		text-transform uppercase
+		font-weight 900
 		padding-right $chart-margin
 		color black
-		margin-bottom -1.5rem
+		margin-bottom -2.2rem
 
 
 
