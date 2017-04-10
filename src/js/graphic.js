@@ -19,6 +19,7 @@ const NUM_VIDEOS = 100
 const MARGIN = { top: 20, right: 20, bottom: 20, left: 20 }
 const RATIO = 3
 
+const currentIndex = []
 
 const categoryColors = {
 	dunk: '#e41a1c',
@@ -57,9 +58,6 @@ function cleanData(row) {
 }
 
 function rollupDecade(values) {
-	// const sorted = values.sort((a, b) =>
-	// 	d3.descending(a.agg_view_count, b.agg_view_count)
-	// )
 	return values
 		.slice(0, NUM_VIDEOS)
 		.map((d, i) => ({ ...d, index: i }))
@@ -74,13 +72,11 @@ function loadData() {
 					.key(d => d.decade_display).sortKeys(d3.descending)
 					.rollup(rollupDecade)
 					.entries(data)
-					// .sort((a, b) => d3.descending(a.key, b.key))
 
 				dataByDecade.forEach(d => {
 					d.value[0].annotation = 'tk'
 				})
 
-				// console.log(dataByDecade)
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -90,24 +86,57 @@ function loadData() {
 }
 
 function displayTitle({ decade, index, reset }) {
-	const d = dataByDecade[decade].value[index]
+	const datum = dataByDecade[decade].value[index]
 	const year = graphic.selectAll('.year__chart').filter((d, i) => i === decade)
 
 	const w = year.node().offsetWidth
 	const right = index > NUM_VIDEOS / 2
 	const pos = scale.position(index) + MARGIN.left
 	const x = right ? w - pos : pos
-	const y = scale.size[decade](d.agg_view_count) + MARGIN.bottom * 1.25
+
+	const annotation = year.select('.year__annotation')
+	const annotationText = annotation.select('.annotation__text')
+	annotationText.select('.text__title').text(datum.title)
+	annotationText.select('.text__date').text(`${datum.date} - ${datum.views} views`)
+
+	annotationText
+		.style('left', right ? 'auto' : `${x}px`)
+		.style('right', right ? `${x}px` : 'auto')
+		.style('text-align', right ? 'right' : 'left')
+		.classed('is-visible', true)
+
+	// const current = Youtube.getCurrent()
+	annotation.classed('is-visible', true)
+}
+
+function updateDetail({ decade, index }) {
+	const datum = dataByDecade[decade].value[index]
+
+	const year = chart.selectAll('.year')
+		.filter((d, i) => i === decade)
+
+	const w = year.node().offsetWidth
+	const right = index > NUM_VIDEOS / 2
+	const pos = scale.position(index) + MARGIN.left
+	const x = right ? w - pos : pos
+	const y = scale.size[decade](datum.agg_view_count) + MARGIN.bottom * 1.25
+
 	const detail = year.select('.year__detail')
 
-	detail.select('.text__title').text(d.title)
-	detail.select('.text__date').text(d.date + ' - ' + `${d.views} views`)
-	detail.select('.text__views').text()
+	detail.select('.text__title').text(datum.title)
+	detail.select('.text__date').text(`${datum.date} - ${datum.views} views`)
 
-	const url = `https://img.youtube.com/vi/${d.external_video_id}/mqdefault.jpg`
+	const url = `https://img.youtube.com/vi/${datum.external_video_id}/mqdefault.jpg`
 
 	detail.select('.detail__thumbnail')
 		.style('background-image', `url("${url}")`)
+
+	// hide others
+	chart.selectAll('.year__detail').classed('is-visible', false)
+
+	// hide click to play
+	year.select('.year__annotation')
+		.classed('is-visible', false)
 
 	detail
 		.style('left', right ? 'auto' : `${x}px`)
@@ -117,18 +146,25 @@ function displayTitle({ decade, index, reset }) {
 }
 
 function jumpToPlay({ decadeIndex, videoIndex }) {
+	const d = dataByDecade[decadeIndex].value[videoIndex]
+
 	const year = chart.selectAll('.year')
 		.filter((d, i) => i === decadeIndex)
 
+	chart.selectAll('.item')
+		.classed('is-playing', false)
+
 	year.selectAll('.item')
-		.classed('is-active', false)
-		.filter((d, i) => i === videoIndex)
-			.classed('is-active', true)
+		.classed('is-selected', false)
+	.filter((d, i) => i === videoIndex)
+		.classed('is-playing', true)
 
 	// update label
-	const d = dataByDecade[decadeIndex].value[videoIndex]
 	Youtube.updateTitle({ decadeIndex, ...d })
 	displayTitle({ decade: decadeIndex, index: videoIndex, reset: true })
+	currentIndex[decadeIndex] = videoIndex
+
+	updateDetail({ decade: decadeIndex, index: videoIndex })
 }
 
 function handlePlayClick(d, i) {
@@ -139,48 +175,45 @@ function handlePlayClick(d, i) {
 	Youtube.updateTitle({ decadeIndex, ...d })
 
 	// deactive other plays
-	d3.select(this.parentNode).selectAll('.item')
-		.classed('is-active', false)
+	chart.selectAll('.item')
+		.classed('is-playing', false)
 
-	d3.select(this).classed('is-active', true)
+	d3.select(this.parentNode).selectAll('.item')
+		.classed('is-selected', false)
+
+	d3.select(this)
+		.classed('is-playing', true)
+		.classed('is-selected', true)
+
+	currentIndex[decadeIndex] = i
+	updateDetail({ decade: decadeIndex, index: i })
 }
 
 function handlePlayEnter(d) {
 	const decade = decadeToIndex(d.decade_display)
 	const index = d.index
+
+	d3.select(this.parentNode).selectAll('.item')
+		.classed('is-selected', false)
+
 	displayTitle({ decade, index })
 }
 
 function handlePlayExit() {
 	const parent = d3.select(this.parentNode)
-	parent.select('.detail__text')
-		.classed('is-visible', false)
-		.text('')
-	parent.select('.annotation__thumbnail')
-		.classed('is-visible', false)
 
-	const decadeIndex = decadeToIndex(parent.datum().key)
-	const { player, video } = Youtube.getCurrent(decadeIndex)
-	displayTitle({ decade: player, index: video, reset: true })
-}
+	const decade = decadeToIndex(parent.datum().key)
+	const index = currentIndex[decade]
 
-function createAnnotation(d) {
-	// console.log(d)
-	const grandpa = d3.select(this.parentNode.parentNode)
-	const right = d.index > NUM_VIDEOS / 2
-	const percent = Math.floor(d.index / NUM_VIDEOS * 100)
-	const off = right ? 100 - percent : percent
-	const before = right ? '' : '&dtrif; '
-	const after = right ? ' &dtrif;' : ''
-	grandpa.select('.plays__annotation').append('p')
-		.attr('class', 'annotation__text')
-		.html(`${before}${d.annotation}${after}`)
-		.style('margin-left', right ? 'auto' : `${off}%`)
-		.style('margin-right', right ? `${off}%` : 'auto')
-		.style('text-align', right ? 'right' : 'left')
+	const year = chart.selectAll('.year')
+		.filter((d, i) => i === decade)
 
-	grandpa.select('.plays__annotation').append('div')
-		.attr('class', 'annotation__thumbnail')
+	year.selectAll('.item')
+		.classed('is-selected', false)
+	.filter((d, i) => i === index)
+		.classed('is-selected', true)
+
+	displayTitle({ decade, index, reset: true })
 }
 
 function createChart() {
@@ -242,13 +275,17 @@ function createChart() {
 
 	detailText.append('span').attr('class', 'text__title')
 	detailText.append('span').attr('class', 'text__date')
-	detailText.append('span').attr('class', 'text__views')
 
-	// .text((d) => {
-	// 		const first = d.value[0]
-	// 		return `${first.title} ${first.views} views`
-	// 	})
+	const annotation = yearChart.append('div')
+		.attr('class', 'year__annotation')
 
+	const annotationText = annotation.append('p')
+		.attr('class', 'annotation__text')
+
+	annotationText.append('span').attr('class', 'text__click')
+		.text('Click to play')
+	annotationText.append('span').attr('class', 'text__title')
+	annotationText.append('span').attr('class', 'text__date')
 }
 
 function createKey() {
@@ -297,12 +334,14 @@ function setupTitles() {
 		const year = chart.selectAll('.year')
 			.filter((d, i) => i === decadeIndex)
 
+		let targetIndex = 0
+		if (decadeIndex > 0) targetIndex = Math.floor(Math.random() * NUM_VIDEOS / 2)
 		year.selectAll('.item')
-			.classed('is-active', false)
-			.filter((d, i) => i === 0)
-				.classed('is-active', true)
+			.filter((d, i) => i === targetIndex)
+				.classed('is-selected', true)
 
-		displayTitle({ decade: decadeIndex, index: 0, reset: true })
+		displayTitle({ decade: decadeIndex, index: targetIndex, reset: true })
+		currentIndex.push(targetIndex)
 	})
 }
 

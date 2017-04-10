@@ -12,7 +12,7 @@
 			font-weight bold
 			display block
 			position absolute
-			bottom 0
+			bottom 0.25rem
 			left $chart-margin
 
 		&:after
@@ -21,7 +21,7 @@
 			font-weight bold
 			display block
 			position absolute
-			bottom 0
+			bottom 0.25rem
 			right $chart-margin
 
 	.year__text
@@ -82,7 +82,9 @@
 		cursor pointer
 		stroke #fff
 		fill $gray-light
-		&.is-active
+		&.is-selected
+			fill $gray
+		&.is-playing
 			fill $red
 		&.is-player
 			fill $blue
@@ -100,17 +102,8 @@
 		border-radius 5px
 		background #fff
 		box-shadow 0 0 0.5rem #fff
-		// &:before
-		// 	content 'Click to play'
-		// 	display block
-		// 	text-transform uppercase
-		// 	position absolute
-		// 	transform translate(-0.5rem, -225%)
-		// 	font-size 0.6rem
-		// 	color $gray
-		// 	font-weight 500
-
-
+		pointer-events none
+		visibility hidden
 		&.is-visible
 			visibility visible
 
@@ -121,7 +114,8 @@
 		line-height 1.2
 		padding 0 1em
 		span
-			padding-bottom 0.25em
+			display block
+			padding-bottom 0.25rem
 			color $gray-dark
 			font-weight 400
 		.text__title
@@ -129,6 +123,7 @@
 			color black
 			font-weight 500
 			font-size .75rem
+	
 	.detail__thumbnail
 		width 35%
 		height 3.5rem
@@ -138,13 +133,36 @@
 		background-position center center
 		background-size cover
 
-	.chart__key
-		display flex
-		margin-top 2rem
-		p
-			font-size 0.8rem
-			font-weight bold
-			display inline-block
-			width 6rem
-			text-align center
-			padding 0 1rem
+
+	.year__annotation
+		background #fff
+		z-index set-index('overlay')
+		position relative
+		transform translateY(-0.25rem)
+		visibility hidden
+		&.is-visible
+			visibility visible
+	.annotation__text
+		width 50%
+		position absolute
+		font-size 0.8rem
+		font-weight 700
+		line-height 1.2
+		span
+			display block
+			padding-bottom 0.2rem
+			font-weight 400
+		.text__click
+			font-size 0.75em
+			text-transform uppercase
+			letter-spacing 0.05em
+			color $gray-dark
+			font-weight 500
+			padding-bottom 0.1rem
+		.text__title
+			color $off-black
+			font-weight 500
+		.text__date 
+			color $gray
+			padding-bottom 0
+			font-size 0.8em

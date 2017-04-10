@@ -8,8 +8,8 @@ const graphic = d3.select('.graphic__video')
 const RATIO = 1.5
 let dataByDecade = null
 
-function getCurrent(i) {
-	return { player: i, video: player.videoIndex }
+function getCurrent() {
+	return player
 }
 
 function resize() {
