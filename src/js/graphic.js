@@ -6,6 +6,7 @@ import Youtube from './youtube'
 import Text from './text'
 
 let dataByDecade = null
+let dataFlat = null
 let decades = null
 
 let chartWidth = 0
@@ -73,10 +74,7 @@ function loadData() {
 					.rollup(rollupDecade)
 					.entries(data)
 
-				dataByDecade.forEach(d => {
-					d.value[0].annotation = 'tk'
-				})
-
+				dataFlat = d3.merge(dataByDecade.map(d => d.value))
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
@@ -311,6 +309,32 @@ function handleSearchChange() {
 		.classed('is-player', false)
 		.filter(d => d.players.toLowerCase().includes(name))
 		.classed('is-player', true)
+
+	const filtered = dataFlat.filter(d => d.players.toLowerCase().includes(name))
+
+	const byDecade = d3.nest()
+		.key(d => d.decade)
+		.rollup(v => v.slice(0, 1)[0])
+		.entries(filtered)
+
+	const results = graphic.select('.results')
+	results.selectAll('.result').remove()
+
+	const p = results.selectAll('.result').data(byDecade)
+		.enter().append('p')
+			.attr('class', 'result')
+
+	p.append('span')
+		.attr('class', 'result__rank')
+		.text(d => `#${d.value.index + 1} in ${d.value.decade} - `)
+
+	p.append('span')
+		.attr('class', 'result__title')
+		.text(d => `${d.value.title}`)
+
+	p.append('span')
+		.attr('class', 'result__meta')
+		.text(d => ` - ${d.value.date}, ${d.value.views} views`)
 }
 
 function setupScales() {
