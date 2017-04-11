@@ -326,7 +326,8 @@ function createChart() {
 
 	text.append('p')
 		.attr('class', 'text__description')
-		.html((d, i) => Text[i].description)
+		.attr('data-index', (d, i) => i)
+		.html((d, i) => Text[i])
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
@@ -336,7 +337,7 @@ function createChart() {
 
 	yearChart.append('p')
 		.attr('class', 'year__title')
-		.html((d, i) => `Moments ranked by<br>YouTube views, ${Text[i].era}`)
+		.html((d, i) => `Moments ranked by<br>YouTube views, ${decadeTitles[i]}`)
 
 	const g = svg.append('g')
 		.attr('class', 'g-graphic')
@@ -574,6 +575,26 @@ function setupCategories() {
 		.on('click', handleCategoryChange)
 }
 
+function setupIntroEvents() {
+	chart.selectAll('.description__link').on('click', function() {
+		const sel = d3.select(this)
+		const filter = sel.attr('data-filter')
+		const value = sel.attr('data-value')
+		if (filter === 'player') {
+			d3.select('.search__input input').node().value = value
+			handleSearchChange.call({ value })
+		} else if (filter === 'play') {
+			const index = +d3.select(this.parentNode).attr('data-index')
+			const item = chart.selectAll('.year')
+				.filter((d, i) => i === index)
+				.selectAll('.item')
+				.filter((d, i) => i === +value - 1)
+
+			handlePlayClick.call(item.node(), item.datum())
+		}
+	})
+}
+
 function setup() {
 	setupScales()
 	Youtube.setup(dataByDecade)
@@ -585,7 +606,7 @@ function setup() {
 	setupCategories()
 	setupTitles()
 	setupScroll()
-	// setup
+	setupIntroEvents()
 	return Promise.resolve()
 }
 
