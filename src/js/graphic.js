@@ -278,7 +278,7 @@ function handleSearchChange() {
 		.attr('class', 'result__count')
 		.text((d) => {
 			const v = d.value === 1 ? '' : 's'
-			return `${d.value} video${v}`
+			return `${d.value} moment${v}`
 		})
 		.on('click', handleResultClick)
 }
@@ -335,9 +335,14 @@ function createChart() {
 	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
 
+
+
 	yearChart.append('p')
 		.attr('class', 'year__title')
-		.html((d, i) => `Moments ranked by<br>YouTube views, ${decadeTitles[i]}`)
+		.html(function(d,i){
+			return "`Moments ranked by<br>YouTube views "+d.key;
+		})
+		// .html((d, i) => `Moments ranked by<br>YouTube views, ${decadeTitles[i]}`)
 
 	const g = svg.append('g')
 		.attr('class', 'g-graphic')
