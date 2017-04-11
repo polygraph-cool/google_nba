@@ -243,7 +243,7 @@ function resetCategory() {
 }
 
 function handleSearchChange() {
-	let name = this.value ? this.value.toLowerCase() : ''
+	let name = this.value ? this.value.toLowerCase().replace(/]W/g, '') : ''
 	name = name.length > 2 ? name : null
 
 	if (name) {
@@ -256,7 +256,7 @@ function handleSearchChange() {
 		.filter(d => d.players.toLowerCase().includes(name))
 		.classed('is-player', true)
 
-	const filtered = dataFlat.filter(d => d.players.toLowerCase().includes(name))
+	const filtered = dataFlat.filter(d => d.players.toLowerCase().replace(/]W/g, '').includes(name))
 
 	const byDecade = d3.nest()
 		.key(d => d.decade)
