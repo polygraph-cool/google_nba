@@ -1,6 +1,7 @@
 import * as d3 from 'd3'
 import 'promis'
 import ScrollMagic from 'scrollmagic'
+import uniq from 'lodash.uniqby'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 import Text from './text'
@@ -53,6 +54,7 @@ function cleanData(row) {
 		date: formatDate(row.date),
 		views: formatViews(row.agg_view_count),
 		decade_display: decadeTitles[row.decade],
+		team: row.team ? row.team.split('|') : [],
 	}
 }
 
@@ -214,6 +216,100 @@ function handlePlayExit() {
 	displayTitle({ decade, index, reset: true })
 }
 
+function handleResultClick(datum) {
+	const index = decadeToIndex(decadeTitles[datum.key])
+	const year = chart.selectAll('.year').filter((d, i) => i === index)
+	const el = year.node()
+	Dom.jumpTo(el)
+
+	// const item = year.selectAll('.item').filter(d => d.index === datum.value.index).node()
+	// handlePlayClick.call(item, datum.value)
+}
+
+function resetTeam() {
+	d3.select('.team__options option').property('selected', true)
+	chart.selectAll('.item').classed('is-team', false)
+}
+
+function resetSearch() {
+	d3.select('.search__input input').node().value = ''
+	chart.selectAll('.item').classed('is-player', false)
+	graphic.selectAll('.result').remove()
+}
+
+function resetCategory() {
+	d3.selectAll('.category__options li').classed('is-selected', false)
+	chart.selectAll('.item').classed('is-category', false)
+}
+
+function handleSearchChange() {
+	let name = this.value ? this.value.toLowerCase() : ''
+	name = name.length > 2 ? name : null
+
+	if (name) {
+		resetTeam()
+		resetCategory()
+	}
+
+	chart.selectAll('.item')
+		.classed('is-player', false)
+		.filter(d => d.players.toLowerCase().includes(name))
+		.classed('is-player', true)
+
+	const filtered = dataFlat.filter(d => d.players.toLowerCase().includes(name))
+
+	const byDecade = d3.nest()
+		.key(d => d.decade)
+		.rollup(v => v.length)
+		.entries(filtered)
+
+	const results = graphic.select('.results')
+	results.selectAll('.result').remove()
+
+	const p = results.selectAll('.result').data(byDecade)
+		.enter().append('p')
+			.attr('class', 'result')
+
+	p.append('span')
+		.attr('class', 'result__era')
+		.text(d => `${decadeTitles[d.key]}: `)
+
+	p.append('span')
+		.attr('class', 'result__count')
+		.text((d) => {
+			const v = d.value === 1 ? '' : 's'
+			return `${d.value} video${v}`
+		})
+		.on('click', handleResultClick)
+}
+
+function handleTeamChange() {
+	resetSearch()
+	resetCategory()
+
+	const team = this.value
+	chart.selectAll('.item')
+		.classed('is-team', false)
+		.filter(d => d.team.includes(team))
+			.classed('is-team', true)
+}
+
+function handleCategoryChange() {
+	resetTeam()
+	resetSearch()
+
+	const sel = d3.select(this)
+	const cat = sel.attr('data-type')
+
+	d3.selectAll('.category__options li').classed('is-selected', false)
+	sel.classed('is-selected', true)
+
+	chart.selectAll('.item')
+		.classed('is-category', false)
+		.filter(d => d.type === cat)
+			.classed('is-category', true)
+}
+
 function createChart() {
 	const year = chart.selectAll('.year')
 		.data(dataByDecade)
@@ -284,53 +380,6 @@ function createChart() {
 		.text('Click to play')
 	annotationText.append('span').attr('class', 'text__title')
 	annotationText.append('span').attr('class', 'text__date')
-}
-
-function handleResultClick(datum) {
-	const index = decadeToIndex(datum.value.decade_display)
-	const year = chart.selectAll('.year').filter((d, i) => i === index)
-	const el = year.node()
-	Dom.jumpTo(el)
-
-	const item = year.selectAll('.item').filter(d => d.index === datum.value.index).node()
-	handlePlayClick.call(item, datum.value)
-}
-
-function handleSearchChange() {
-	let name = this.value ? this.value.toLowerCase() : ''
-	name = name.length > 2 ? name : null
-
-	chart.selectAll('.item')
-		.classed('is-player', false)
-		.filter(d => d.players.toLowerCase().includes(name))
-		.classed('is-player', true)
-
-	const filtered = dataFlat.filter(d => d.players.toLowerCase().includes(name))
-
-	const byDecade = d3.nest()
-		.key(d => d.decade)
-		.rollup(v => v.slice(0, 1)[0])
-		.entries(filtered)
-
-	const results = graphic.select('.results')
-	results.selectAll('.result').remove()
-
-	const p = results.selectAll('.result').data(byDecade)
-		.enter().append('p')
-			.attr('class', 'result')
-
-	p.append('span')
-		.attr('class', 'result__rank')
-		.text(d => `#${d.value.index + 1} in ${d.value.decade} - `)
-
-	p.append('span')
-		.attr('class', 'result__title')
-		.text(d => `${d.value.title}`)
-		.on('click', handleResultClick)
-
-	p.append('span')
-		.attr('class', 'result__meta')
-		.text(d => ` - ${d.value.date}, ${d.value.views} views`)
 }
 
 function setupScales() {
@@ -501,6 +550,28 @@ function setupScroll() {
 	enterExitScene.addTo(controller)
 }
 
+function setupKey() {
+	// flatten teams
+	const teams = uniq(d3.merge(dataFlat.map(d => d.team)))
+	teams.unshift('all')
+
+	const select = d3.select('.team__options')
+	
+	const option = select
+		.selectAll('option')
+		.data(teams)
+
+	option.enter().append('option')
+		.text(d => d)
+
+	select.on('change', handleTeamChange)
+}
+
+function setupCategories() {
+	d3.selectAll('.category__options li')
+		.on('click', handleCategoryChange)
+}
+
 function setup() {
 	setupScales()
 	Youtube.setup(dataByDecade)
@@ -508,6 +579,8 @@ function setup() {
 	resize()
 
 	setupSearch()
+	setupKey()
+	setupCategories()
 	setupTitles()
 	setupScroll()
 	return Promise.resolve()
