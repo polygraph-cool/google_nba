@@ -583,6 +583,7 @@ function setup() {
 	setupCategories()
 	setupTitles()
 	setupScroll()
+	// setup
 	return Promise.resolve()
 }
 
