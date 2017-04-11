@@ -287,7 +287,7 @@ function handleTeamChange() {
 	resetSearch()
 	resetCategory()
 
-	const team = this.value
+	const team = this.value.toLowerCase()
 	chart.selectAll('.item')
 		.classed('is-team', false)
 		.filter(d => d.team.includes(team))
@@ -553,10 +553,12 @@ function setupScroll() {
 function setupKey() {
 	// flatten teams
 	const teams = uniq(d3.merge(dataFlat.map(d => d.team)))
-	teams.unshift('all')
+		.map(d => d.toUpperCase())
+
+	teams.unshift('All')
 
 	const select = d3.select('.team__options')
-	
+
 	const option = select
 		.selectAll('option')
 		.data(teams)
