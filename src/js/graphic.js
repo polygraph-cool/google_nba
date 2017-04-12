@@ -106,6 +106,12 @@ function displayTitle({ decade, index, reset }) {
 
 	// const current = Youtube.getCurrent()
 	annotation.classed('is-visible', true)
+
+	// hide axis label
+	const hideBefore = index < 9
+	const hideAfter = index > NUM_VIDEOS - 7
+	year.classed('is-hidden-before', hideBefore)
+	year.classed('is-hidden-after', hideAfter)
 }
 
 function updateDetail({ decade, index }) {

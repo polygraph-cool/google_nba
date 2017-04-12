@@ -6,6 +6,10 @@
 	.year__chart
 		position relative
 		margin-bottom 6rem
+		&.is-hidden-before:before
+			opacity 0
+		&.is-hidden-after:after
+			opacity 0
 
 		&:before
 			content '#1 most viewed'
@@ -19,6 +23,7 @@
 			bottom 1rem
 			left $chart-margin
 			transform translateY(100%)
+			transition 100ms opacity
 
 		&:after
 			content '#100'
@@ -28,6 +33,7 @@
 			position absolute
 			bottom 0.25rem
 			right $chart-margin
+			transition 100ms opacity
 
 	.year__text
 		display flex
