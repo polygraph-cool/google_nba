@@ -8,13 +8,17 @@
 		margin-bottom 6rem
 
 		&:before
-			content '#1'
+			content '#1 most viewed'
+			text-transform uppercase
+			width 2rem
 			font-size 0.6rem
+			line-height 1.2
 			font-weight bold
 			display block
 			position absolute
-			bottom 0.25rem
+			bottom 1rem
 			left $chart-margin
+			transform translateY(100%)
 
 		&:after
 			content '#100'
@@ -159,10 +163,9 @@
 
 
 	.year__annotation
-		background #fff
 		z-index set-index('overlay')
 		position relative
-		transform translateY(-1.5rem)
+		transform translateY(-1.4rem)
 		visibility none
 		&.is-visible
 			visibility visible
