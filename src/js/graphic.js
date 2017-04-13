@@ -471,6 +471,8 @@ function updateAxis() {
 		const label = axis.selectAll('.label')
 			.data(values)
 
+		axis.selectAll('.axis__label').remove()
+
 		const enter = label.enter().append('g')
 			.attr('class', 'axis__label')
 
@@ -502,7 +504,7 @@ function updateChartElements() {
 	const yearChart = chart.selectAll('.year__chart')
 
 	yearChart
-		.style('width', `${outerWidth}px`)
+	// 	.style('width', `${outerWidth}px`)
 		.style('height', `${outerHeight}px`)
 
 	svg
@@ -548,8 +550,8 @@ function resize() {
 	chartHeight = h - MARGIN.top - MARGIN.bottom
 
 	updateScales()
-	updateAxis()
 	updateChartElements()
+	updateAxis()
 }
 
 function setupScroll() {
