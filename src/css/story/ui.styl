@@ -2,9 +2,11 @@
 	width 100%
 	margin 0 auto
 	padding 1rem 0
-	display flex
 	flex-wrap wrap
 	justify-content flex-start
+	display none
+	+mq('bp-4')
+		display flex
 
 	.ui-label
 		color $gray
@@ -64,6 +66,18 @@
 				border-bottom-right-radius 3px
 				border-top-right-radius 3px
 
+.chart__era
+	display block
+	+mq('bp-4')
+		display none
+	.era__select
+		height 1.58rem	
+		background white
+		font-size 0.8rem
+		font-family roboto
+		border-color $gray
+		margin-bottom 0.5rem
+		
 .results 
 	display flex
 	flex-wrap wrap

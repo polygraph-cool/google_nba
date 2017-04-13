@@ -11,7 +11,8 @@
 		font-weight 400
 		color grey-dark
 		padding-bottom 1rem
-		border-bottom 1px solid $gray-light
+		+mq('bp-4')
+			border-bottom 1px solid $gray-light
 
 	.label__decade
 		text-transform capitalize
@@ -24,8 +25,10 @@
 		margin-right 0.25em
 
 	.label__title
-		font-size 1.3rem
+		font-size 1rem
 		font-weight 500
 		line-height 1.2
+		+mq('bp-4')
+			font-size 1.3rem
 		
 		

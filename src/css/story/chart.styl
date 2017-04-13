@@ -1,11 +1,23 @@
 .graphic__chart
-	width 55%
+	width 100%
+	order 2
 	padding 1rem
+	padding 0.5rem
+	+mq('bp-4')
+		width 55%
+		padding 1rem
 	.year
 		position relative
+		display none
+		&.is-active 
+			display block
+		+mq('bp-4')
+			display block
 	.year__chart
 		position relative
-		margin-bottom 6rem
+		margin-bottom 5rem
+		+mq('bp-4')
+			margin-bottom 6rem
 		&.is-hidden-before:before
 			opacity 0
 		&.is-hidden-after:after
@@ -41,6 +53,9 @@
 		align-items center
 		padding-bottom 5rem
 		justify-content space-between
+		display none
+		+mq('bp-4')
+			display block
 
 	.text__label
 		width 100%
@@ -77,26 +92,30 @@
 				text-shadow 0.03em 0 #fff, -0.03em 0 #fff, 0 0.03em #fff, 0 -0.03em #fff, 0.06em 0 #fff, -0.06em 0 #fff, 0.09em 0 #fff, -0.09em 0 #fff, 0.12em 0 #fff, -0.12em 0 #fff, 0.15em 0 #fff, -0.15em 0 #fff
 				background-position	0 95%,100% 95%,0 95%
 
-
 	.year__title
 		text-align center
 		letter-spacing .02em
 		line-height	1.5
 		color $off-black
 		font-size 0.65em
-		position absolute
-		top 0.3rem
-		left 0
 		width 20em
 		text-transform uppercase
 		font-weight bold
-		padding-right $chart-margin
-		margin 0 auto
-		right 0
 		background #fff
-
+		margin 0 auto
+		position absolute
+		top 0.3rem
+		left 0
+		right 0
+		padding-right $chart-margin
+		display none
+		+mq('bp-4')
+			display block
 
 	.axis__label
+		display none
+		+mq('bp-4')
+			display block
 		text
 			font-size 0.6rem
 			fill $gray
@@ -105,6 +124,7 @@
 			stroke-width 1px
 			stroke-dasharray 2px 2px
 			shape-rendering crispEdges
+	
 	.item
 		&.is-selected .item__bar
 			fill $gray
@@ -134,6 +154,9 @@
 		pointer-events none
 		opacity 0
 		z-index set-index('overlay')
+		display none 
+		+mq('bp-4')
+			display block
 		&:before
 			content ' '
 			height 0
@@ -173,14 +196,11 @@
 		background-position center center
 		background-size cover
 
-
 	.year__annotation
 		z-index set-index('overlay')
 		position relative
 		transform translateY(-1.4rem)
-		visibility none
-		&.is-visible
-			visibility visible
+
 	.annotation__text
 		width 50%
 		position absolute
@@ -235,3 +255,9 @@
 			color $gray
 			padding-bottom 0
 			font-size 0.85em
+	
+	.year__slider
+		width 90%
+		margin 0 auto
+		+mq('bp-4')
+			display none

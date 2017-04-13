@@ -2,10 +2,13 @@ import * as d3 from 'd3'
 import 'promis'
 import ScrollMagic from 'scrollmagic'
 import uniq from 'lodash.uniqby'
+import * as noUiSlider from 'nouislider'
 import './utils/find-index-polyfill'
 import Youtube from './youtube'
 import Text from './text'
 import * as Dom from './utils/dom'
+
+let mobile = false
 
 let dataByDecade = null
 let dataFlat = null
@@ -232,6 +235,16 @@ function handleResultClick(datum) {
 	// handlePlayClick.call(item, datum.value)
 }
 
+function handleSlider({ decade, index }) {
+	const j = decadeToIndex(decade)
+	const year = d3.selectAll('.year').filter((d, i) => i === j)
+
+	const item = year.selectAll('.item')
+		.filter((d, i) => i === index)
+
+	handlePlayEnter.call(item.node(), item.datum())
+}
+
 function resetTeam() {
 	d3.select('.team__options option').property('selected', true)
 	chart.selectAll('.item').classed('is-team', false)
@@ -300,6 +313,12 @@ function handleTeamChange() {
 			.classed('is-team', true)
 }
 
+function handleEraChange() {
+	const index = +this.value
+	const years = d3.selectAll('.year')
+	years.classed('is-active', (d, i) => i === index)
+}
+
 function handleCategoryChange() {
 	resetTeam()
 	resetSearch()
@@ -322,6 +341,7 @@ function createChart() {
 		.enter()
 		.append('div')
 		.attr('class', 'year')
+		.classed('is-active', (d, i) => i === 0)
 
 	const text = year.append('div')
 		.attr('class', 'year__text')
@@ -340,8 +360,6 @@ function createChart() {
 
 	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
-
-
 
 	yearChart.append('p')
 		.attr('class', 'year__title')
@@ -392,6 +410,10 @@ function createChart() {
 		.text('Click to play')
 	annotationText.append('span').attr('class', 'text__title')
 	annotationText.append('span').attr('class', 'text__date')
+
+	year.append('div')
+		.attr('class', 'year__slider')
+		.attr('id', (d, i) => `slider-${i}`)
 }
 
 function setupScales() {
@@ -495,12 +517,14 @@ function updateChartElements() {
 	svg.selectAll('.item__bar')
 		.attr('width', x)
 		.attr('height', (d) => {
+			if (mobile) return chartHeight
 			const index = decadeToIndex(d.decade_display)
 			const v = scale.size[index](d.agg_view_count)
 			return v
 		})
 		.attr('x', d => scale.position(d.index))
 		.attr('y', (d) => {
+			if (mobile) return 0
 			const index = decadeToIndex(d.decade_display)
 			const v = chartHeight - scale.size[index](d.agg_view_count)
 			return v
@@ -512,11 +536,13 @@ function updateChartElements() {
 		.attr('x', d => scale.position(d.index))
 		.attr('y', 0)
 }
+
 function resize() {
+	mobile = d3.select('body').node().offsetWidth < 800
 	Youtube.resize()
 	const yearChart = chart.selectAll('.year__chart')
 	const w = yearChart.node().offsetWidth
-	const h = Math.floor(w / RATIO)
+	const h = mobile ? 80 : Math.floor(w / RATIO)
 
 	chartWidth = w - MARGIN.left - MARGIN.right
 	chartHeight = h - MARGIN.top - MARGIN.bottom
@@ -539,25 +565,28 @@ function setupScroll() {
 
 	enterExitScene
 		.on('enter', function(event) {
-			const bb = sticky.node().getBoundingClientRect()
-			const right = d3.select('main').node().offsetWidth - bb.right
+			if (!mobile) {
+				const bb = sticky.node().getBoundingClientRect()
+				const right = d3.select('main').node().offsetWidth - bb.right
 
-			sticky
-				.classed('is-fixed', true)
-				.style('right', `${right}px`)
-				.style('width', `${bb.width}px`)
+				sticky
+					.classed('is-fixed', true)
+					.style('right', `${right}px`)
+					.style('width', `${bb.width}px`)
 
-			const bottom = event.scrollDirection === 'REVERSE'
-			if (bottom) sticky.classed('is-bottom', false)
+				const bottom = event.scrollDirection === 'REVERSE'
+				if (bottom) sticky.classed('is-bottom', false)
+			}
 		})
 		.on('leave', function(event) {
-
-			sticky
-				.classed('is-fixed', false)
-				.style('right', '0')
-				.style('width', '45%')
-			const bottom = event.scrollDirection === 'FORWARD'
-			if (bottom) sticky.classed('is-bottom', true)
+			if (!mobile) {
+				sticky
+					.classed('is-fixed', false)
+					.style('right', '0')
+					.style('width', '45%')
+				const bottom = event.scrollDirection === 'FORWARD'
+				if (bottom) sticky.classed('is-bottom', true)
+			}
 		})
 	enterExitScene.addTo(controller)
 }
@@ -587,7 +616,7 @@ function setupCategories() {
 }
 
 function setupIntroEvents() {
-	chart.selectAll('.description__link').on('click', function() {
+	chart.selectAll('.description__link').on('click', function handleClick() {
 		const sel = d3.select(this)
 		const filter = sel.attr('data-filter')
 		const value = sel.attr('data-value')
@@ -599,13 +628,39 @@ function setupIntroEvents() {
 			const item = chart.selectAll('.year')
 				.filter((d, i) => i === index)
 				.selectAll('.item')
-				.filter(function(d,i){
-					return d.external_video_id === value;
-				})
+				.filter(d => d.external_video_id === value)
 
 			handlePlayClick.call(item.node(), item.datum())
 		}
 	})
+}
+
+function setupSlider() {
+	graphic.selectAll('.year__slider').each((d, i, nodes) => {
+		noUiSlider.create(nodes[i], {
+			start: 0,
+			connect: [true, false],
+			step: 1,
+			range: { min: 0, max: NUM_VIDEOS - 1 },
+		})
+
+		nodes[i].noUiSlider.on('update', function slide() {
+			const index = +this.get()
+			handleSlider({ decade: d.key, index })
+		})
+	})
+}
+
+function setupDropdown() {
+	const select = graphic.select('.era__select')
+
+	select.selectAll('option')
+		.data(decades)
+		.enter().append('option')
+		.text(d => d)
+		.attr('value', (d, i) => i)
+
+	select.on('change', handleEraChange)
 }
 
 function setup() {
@@ -618,12 +673,17 @@ function setup() {
 	setupKey()
 	setupCategories()
 	setupTitles()
-	setupScroll()
 	setupIntroEvents()
+
+	setupSlider()
+	setupScroll()
+	setupDropdown()
+
 	return Promise.resolve()
 }
 
 function init() {
+	mobile = d3.select('body').node().offsetWidth < 800
 	loadData()
 		.then(Youtube.init)
 		.then(setup)
