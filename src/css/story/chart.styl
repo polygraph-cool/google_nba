@@ -80,25 +80,31 @@
 
 	.year__title
 		text-align center
+		letter-spacing .02em
 		line-height	1.5
 		color $off-black
 		font-size 0.65em
 		position absolute
 		top 0.3rem
 		left 0
-		width 100%
+		width 20em
 		text-transform uppercase
 		font-weight bold
 		padding-right $chart-margin
+		margin 0 auto
+		right 0
+		background #fff
+
 
 	.axis__label
 		text
 			font-size 0.6rem
 			fill $gray
 		line
-			stroke lighten($gray, 20)
-			stroke-width 0.5px
-			stroke-dasharray 4px 4px
+			stroke lighten($gray, 25)
+			stroke-width 1px
+			stroke-dasharray 2px 2px
+			shape-rendering crispEdges
 	.item
 		&.is-selected .item__bar
 			fill $gray
@@ -224,7 +230,8 @@
 		.text__title
 			color $off-black
 			font-weight 500
+			margin-top .2rem
 		.text__date
 			color $gray
 			padding-bottom 0
-			font-size 0.8em
+			font-size 0.85em

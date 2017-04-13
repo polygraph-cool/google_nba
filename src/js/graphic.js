@@ -346,7 +346,7 @@ function createChart() {
 	yearChart.append('p')
 		.attr('class', 'year__title')
 		.html(function(d,i){
-			return "`Moments ranked by<br>YouTube views "+d.key;
+			return "`Moments ranked by<br>YouTube views, "+d.key;
 		})
 		// .html((d, i) => `Moments ranked by<br>YouTube views, ${decadeTitles[i]}`)
 
@@ -599,7 +599,9 @@ function setupIntroEvents() {
 			const item = chart.selectAll('.year')
 				.filter((d, i) => i === index)
 				.selectAll('.item')
-				.filter((d, i) => i === +value - 1)
+				.filter(function(d,i){
+					return d.external_video_id === value;
+				})
 
 			handlePlayClick.call(item.node(), item.datum())
 		}
