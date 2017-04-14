@@ -180,15 +180,17 @@ function jumpToPlay({ decadeIndex, videoIndex }) {
 }
 
 function handleAnnotationClick() {
-	const sel = d3.select(this)
-	const index = +sel.attr('data-index')
-	const decade = +sel.attr('data-decade')
-	const item = chart.selectAll('.year')
-		.filter((d, i) => i === decade)
-		.selectAll('.item')
-		.filter(d => d.index === index)
+	if (mobile) {
+		const sel = d3.select(this)
+		const index = +sel.attr('data-index')
+		const decade = +sel.attr('data-decade')
+		const item = chart.selectAll('.year')
+			.filter((d, i) => i === decade)
+			.selectAll('.item')
+			.filter(d => d.index === index)
 
-	handlePlayClick.call(item.node(), item.datum())
+		handlePlayClick.call(item.node(), item.datum())
+	}
 }
 
 function handlePlayClick(d) {
