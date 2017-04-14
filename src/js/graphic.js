@@ -106,13 +106,16 @@ function displayTitle({ decade, index, reset }) {
 		.style('text-align', right ? 'right' : 'left')
 		.classed('is-right', right)
 		.classed('is-visible', true)
+		.attr('data-decade', decade)
+		.attr('data-index', index)
 
 	// const current = Youtube.getCurrent()
 	annotation.classed('is-visible', true)
 
 	// hide axis label
-	const hideBefore = index < 9
-	const hideAfter = index > NUM_VIDEOS - 7
+	const dist = mobile ? 12 : 8
+	const hideBefore = index < dist
+	const hideAfter = index > NUM_VIDEOS - dist
 	year.classed('is-hidden-before', hideBefore)
 	year.classed('is-hidden-after', hideAfter)
 }
@@ -174,6 +177,18 @@ function jumpToPlay({ decadeIndex, videoIndex }) {
 	currentIndex[decadeIndex] = videoIndex
 
 	updateDetail({ decade: decadeIndex, index: videoIndex })
+}
+
+function handleAnnotationClick() {
+	const sel = d3.select(this)
+	const index = +sel.attr('data-index')
+	const decade = +sel.attr('data-decade')
+	const item = chart.selectAll('.year')
+		.filter((d, i) => i === decade)
+		.selectAll('.item')
+		.filter(d => d.index === index)
+
+	handlePlayClick.call(item.node(), item.datum())
 }
 
 function handlePlayClick(d) {
@@ -403,11 +418,12 @@ function createChart() {
 
 	const annotationText = annotation.append('p')
 		.attr('class', 'annotation__text')
+		.on('click', handleAnnotationClick)
 
 	annotationText.append('span').attr('class', 'text__arrow')
 
 	annotationText.append('span').attr('class', 'text__click')
-		.text('Click to play')
+		.text(`${mobile ? 'Tap': 'Click'} to play`)
 	annotationText.append('span').attr('class', 'text__title')
 	annotationText.append('span').attr('class', 'text__date')
 
@@ -618,7 +634,7 @@ function setupCategories() {
 }
 
 function setupIntroEvents() {
-	chart.selectAll('.description__link').on('click', function handleClick() {
+	chart.selectAll('.description__link').on('click', function click() {
 		const sel = d3.select(this)
 		const filter = sel.attr('data-filter')
 		const value = sel.attr('data-value')
