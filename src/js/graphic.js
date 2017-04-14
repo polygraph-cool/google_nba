@@ -48,12 +48,18 @@ function decadeToIndex(decade) {
 	return decades.findIndex(d => d === decade)
 }
 
+function abridge(str) {
+	const len = str.length
+	const end = len >= 50 ? '...' : ''
+	return `${str.slice(0, 47)}${end}`
+}
+
 function cleanData(row) {
 	// add in 2017 as its own decade
 	return {
 		...row,
 		agg_view_count: +row.agg_view_count,
-		title: row.title_custom,
+		title: row.title_custom || abridge(row.title),
 		date: formatDate(row.date),
 		views: formatViews(row.agg_view_count),
 		decade_display: decadeTitles[row.decade],
