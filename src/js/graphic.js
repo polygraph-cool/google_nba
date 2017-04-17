@@ -8,6 +8,7 @@ import Youtube from './youtube'
 import Text from './text'
 import * as Dom from './utils/dom'
 
+
 let mobile = false
 
 let dataByDecade = null
@@ -73,6 +74,14 @@ function rollupDecade(values) {
 		.map((d, i) => ({ ...d, index: i }))
 }
 
+function manual() {
+	dataFlat.filter(d => !d.title_custom)
+		.forEach(d => {
+			const url = `https://www.youtube.com/watch?v=${d.external_video_id}`
+			if (!d.title_custom) console.log(d.external_video_id, url)	
+		})
+}
+
 function loadData() {
 	return new Promise((resolve, reject) => {
 		d3.csv('assets/curated_merged_by_decade.csv', cleanData, (err, data) => {
@@ -84,6 +93,8 @@ function loadData() {
 					.entries(data)
 
 				dataFlat = d3.merge(dataByDecade.map(d => d.value))
+				
+				manual()
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)
 				resolve()
