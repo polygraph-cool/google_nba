@@ -59,8 +59,10 @@ function updateTitle({ decade_display, title, date, views, index }) {
 function jumpTo({ decadeIndex, videoIndex }) {
 	player.videoIndex = videoIndex
 	player.decadeIndex = videoIndex
-	const id = dataByDecade[decadeIndex].value[videoIndex].external_video_id
-	player.loadVideoById(id)
+	const datum = dataByDecade[decadeIndex].value[videoIndex]
+	const videoId = datum.external_video_id
+	const startSeconds = datum.start
+	player.loadVideoById({ videoId, startSeconds })
 	resize()
 }
 
