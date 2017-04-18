@@ -15,7 +15,7 @@
 			display block
 	.year__chart
 		position relative
-		margin-bottom 5rem
+		margin-bottom 4rem
 		width 100%
 		+mq('bp-4')
 			margin-bottom 6rem
@@ -25,7 +25,7 @@
 			opacity 0
 
 		&:before
-			content '#1 most viewed'
+			content '#1'
 			text-transform uppercase
 			width 2rem
 			font-size 0.6rem
@@ -37,6 +37,8 @@
 			left $chart-margin
 			transform translateY(100%)
 			transition 100ms opacity
+			+mq('full')
+				content '#1 most viewed'
 
 		&:after
 			content '#100'
@@ -247,8 +249,8 @@
 			letter-spacing 0.05em
 			color $gray-dark
 			font-weight 500
-			padding-bottom 0.1rem
 			position relative
+			padding-bottom 0
 		.text__title
 			color $off-black
 			font-weight 500
