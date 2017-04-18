@@ -60,11 +60,12 @@ function cleanData(row) {
 	return {
 		...row,
 		agg_view_count: +row.agg_view_count,
+		og_title: row.title,
 		title: row.title_custom || abridge(row.title),
 		date: formatDate(row.date),
 		views: formatViews(row.agg_view_count),
 		decade_display: decadeTitles[row.decade],
-		team: row.team ? row.team.split('|') : [],
+		teams: row.team ? row.team.split('|') : [],
 	}
 }
 
@@ -75,11 +76,19 @@ function rollupDecade(values) {
 }
 
 function manual() {
-	dataFlat.filter(d => !d.title_custom)
-		.forEach(d => {
-			const url = `https://www.youtube.com/watch?v=${d.external_video_id}`
-			if (!d.title_custom) console.log(d.external_video_id, url)	
-		})
+	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tdecade\n'
+		
+		// .filter(d => !d.title_custom)
+	window.output += dataFlat.map(d => {
+		const { external_video_id, title_custom, og_title, team, type, start, decade } = d
+		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${decade}\t`
+		// const url = `https://www.youtube.com/watch?v=${d.external_video_id}`
+		// if (!d.title_custom) console.log(d.external_video_id, url)
+		return out
+	})
+	.join('\n')
+
+
 }
 
 function loadData() {
@@ -343,7 +352,7 @@ function handleTeamChange() {
 	const team = this.value.toLowerCase()
 	chart.selectAll('.item')
 		.classed('is-team', false)
-		.filter(d => d.team.includes(team))
+		.filter(d => d.teams.includes(team))
 			.classed('is-team', true)
 }
 
@@ -630,7 +639,7 @@ function setupScroll() {
 
 function setupKey() {
 	// flatten teams
-	const teams = uniq(d3.merge(dataFlat.map(d => d.team)))
+	const teams = uniq(d3.merge(dataFlat.map(d => d.teams)))
 		.map(d => d.toUpperCase())
 
 	teams.unshift('All')
