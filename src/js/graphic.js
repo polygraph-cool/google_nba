@@ -87,8 +87,6 @@ function manual() {
 		return out
 	})
 	.join('\n')
-
-
 }
 
 function loadData() {
@@ -121,7 +119,7 @@ function displayTitle({ decade, index, reset }) {
 	const pos = scale.position(index) + MARGIN.left - scale.position.bandwidth() / 4
 	const x = right ? w - pos - 4 : pos
 
-	const annotation = year.select('.year__annotation')
+	const annotation = year.selectAll('.year__annotation')
 	const annotationText = annotation.select('.annotation__text')
 	annotationText.select('.text__title').text(datum.title)
 	annotationText.select('.text__date').text(`${datum.date} - ${datum.views} views`)
@@ -172,7 +170,7 @@ function updateDetail({ decade, index }) {
 	chart.selectAll('.year__detail').classed('is-visible', false)
 
 	// hide click to play
-	year.select('.year__annotation')
+	year.selectAll('.year__annotation')
 		.classed('is-visible', false)
 
 	detail
@@ -345,6 +343,21 @@ function handleSearchChange() {
 		.on('click', handleResultClick)
 }
 
+function handleSearchChangeMobile() {
+	let name = this.value ? this.value.toLowerCase().replace(/]W/g, '') : ''
+	name = name.length > 2 ? name : null
+	console.log(name)
+	if (name) {
+		resetTeam()
+		resetCategory()
+	}
+
+	chart.selectAll('.item')
+		.classed('is-player', false)
+		.filter(d => d.players.toLowerCase().includes(name))
+		.classed('is-player', true)
+}
+
 function handleTeamChange() {
 	resetSearch()
 	resetCategory()
@@ -400,6 +413,21 @@ function createChart() {
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
+
+	// const annotationMobile = yearChart.append('div')
+	// 	.attr('class', 'year__annotation year__annotation--mobile')
+
+
+	// const annotationTextMobile = annotationMobile.append('p')
+	// 	.attr('class', 'annotation__text')
+	// 	.on('click', handleAnnotationClick)
+
+	// annotationTextMobile.append('span').attr('class', 'text__arrow')
+
+	// annotationTextMobile.append('span').attr('class', 'text__click')
+	// 	.text(`${mobile ? 'Tap': 'Click'} to play`)
+	// annotationTextMobile.append('span').attr('class', 'text__title')
+	// annotationTextMobile.append('span').attr('class', 'text__date')
 
 	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
@@ -474,8 +502,11 @@ function setupScales() {
 }
 
 function setupSearch() {
-	d3.select('.search__input input')
+	d3.select('.graphic__ui .search__input input')
 		.on('keyup', handleSearchChange)
+
+	d3.select('.chart__era .search__input input')
+		.on('keyup', handleSearchChangeMobile)
 }
 
 function setupTitles() {
