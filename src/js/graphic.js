@@ -381,13 +381,16 @@ function handleCategoryChange() {
 	const sel = d3.select(this)
 	const cat = sel.attr('data-type')
 
+	const enable = !sel.classed('is-selected')
+
 	d3.selectAll('.category__options li').classed('is-selected', false)
-	sel.classed('is-selected', true)
+
+	if (enable) sel.classed('is-selected', true)
 
 	chart.selectAll('.item')
 		.classed('is-category', false)
 		.filter(d => d.type === cat)
-			.classed('is-category', true)
+			.classed('is-category', enable)
 }
 
 function createChart() {
