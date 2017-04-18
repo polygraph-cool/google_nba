@@ -100,7 +100,6 @@ function loadData() {
 					.entries(data)
 
 				dataFlat = d3.merge(dataByDecade.map(d => d.value))
-				
 				manual()
 				// store data decades to map to array indices
 				decades = dataByDecade.map(d => d.key)

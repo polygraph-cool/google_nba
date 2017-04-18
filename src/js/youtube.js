@@ -61,7 +61,7 @@ function jumpTo({ decadeIndex, videoIndex }) {
 	player.decadeIndex = videoIndex
 	const datum = dataByDecade[decadeIndex].value[videoIndex]
 	const videoId = datum.external_video_id
-	const startSeconds = datum.start
+	const startSeconds = datum.start ? +datum.start : 0
 	player.loadVideoById({ videoId, startSeconds })
 	resize()
 }
