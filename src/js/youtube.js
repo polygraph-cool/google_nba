@@ -18,8 +18,6 @@ function resize() {
 		const width = graphic.select('.year__video').node().offsetWidth
 		const height = Math.floor(width / RATIO)
 		player.setSize(width, height)
-		// const offset = (window.innerHeight - height) / 4
-		// graphic.style('padding-top', `${offset}px`)
 	}
 }
 
@@ -38,10 +36,6 @@ function loadScript() {
 }
 
 function onPlayerReady({ target }) {
-	// if (!initialAutoplay) {
-	// 	initialAutoplay = true
-	// 	target.playVideo()
-	// }
 	Graphic.jumpToPlay(target)
 }
 
@@ -90,7 +84,7 @@ function setupPlayer() {
 			controls: 1,
 			cc_load_policy: 0,
 			enablejsapi: 1,
-			fs: 0,
+			fs: 1,
 			iv_load_policy: 3,
 			modestbranding: 0,
 			rel: 0,
@@ -104,9 +98,6 @@ function setupPlayer() {
 
 	player.videoIndex = 0
 	player.decadeIndex = 0
-	// player.nbaPlaylist = playlist
-	// player.decadeIndex = i
-	// players.push(player)
 }
 
 function setup(data) {
