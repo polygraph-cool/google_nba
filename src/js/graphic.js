@@ -78,12 +78,9 @@ function rollupDecade(values) {
 function manual() {
 	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tdecade\n'
 		
-		// .filter(d => !d.title_custom)
 	window.output += dataFlat.map(d => {
 		const { external_video_id, title_custom, og_title, team, type, start, decade } = d
 		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${decade}\t`
-		// const url = `https://www.youtube.com/watch?v=${d.external_video_id}`
-		// if (!d.title_custom) console.log(d.external_video_id, url)
 		return out
 	})
 	.join('\n')
@@ -270,9 +267,6 @@ function handleResultClick(datum) {
 	const year = chart.selectAll('.year').filter((d, i) => i === index)
 	const el = year.node()
 	Dom.jumpTo(el)
-
-	// const item = year.selectAll('.item').filter(d => d.index === datum.value.index).node()
-	// handlePlayClick.call(item, datum.value)
 }
 
 function handleSlider({ decade, index }) {
@@ -415,21 +409,6 @@ function createChart() {
 
 	const yearChart = year.append('div')
 		.attr('class', 'year__chart')
-
-	// const annotationMobile = yearChart.append('div')
-	// 	.attr('class', 'year__annotation year__annotation--mobile')
-
-
-	// const annotationTextMobile = annotationMobile.append('p')
-	// 	.attr('class', 'annotation__text')
-	// 	.on('click', handleAnnotationClick)
-
-	// annotationTextMobile.append('span').attr('class', 'text__arrow')
-
-	// annotationTextMobile.append('span').attr('class', 'text__click')
-	// 	.text(`${mobile ? 'Tap': 'Click'} to play`)
-	// annotationTextMobile.append('span').attr('class', 'text__title')
-	// annotationTextMobile.append('span').attr('class', 'text__date')
 
 	const svg = yearChart.append('svg')
 		.attr('class', 'chart__svg')
@@ -578,7 +557,6 @@ function updateChartElements() {
 	const yearChart = chart.selectAll('.year__chart')
 
 	yearChart
-	// 	.style('width', `${outerWidth}px`)
 		.style('height', `${outerHeight}px`)
 
 	svg
