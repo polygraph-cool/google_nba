@@ -37,7 +37,7 @@
 			left $chart-margin
 			transform translateY(100%)
 			transition 100ms opacity
-			+mq('full')
+			+mq('bp-4')
 				content '#1 most viewed'
 
 		&:after
@@ -248,15 +248,17 @@
 			font-size 0.75em
 			text-transform uppercase
 			letter-spacing 0.05em
-			color $gray-dark
 			font-weight 500
 			position relative
-			padding-bottom 0
 			display inline-block
-			background $blue
+			background-color $blue
 			color white
 			padding 0.15em 0.3em
 			border-radius 3px
+			+mq('bp-4')
+				color $gray-dark
+				background-color transparent
+				padding 0
 		.text__title
 			color $off-black
 			font-weight 500
