@@ -436,7 +436,7 @@ function createChart() {
 
 	yearChart.append('p')
 		.attr('class', 'year__title')
-		.html((d, i) => `Moments ranked by<br>YouTube views, ${decadeTitles[i]}`)
+		.html(d => `Moments ranked by<br>YouTube views, ${d.key}`)
 
 	const g = svg.append('g')
 		.attr('class', 'g-graphic')
