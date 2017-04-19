@@ -560,8 +560,8 @@ function updateChartElements() {
 		.style('height', `${outerHeight}px`)
 
 	svg
-		.style('width', outerWidth)
-		.style('height', outerHeight)
+		.attr('width', outerWidth)
+		.attr('height', outerHeight)
 
 	svg.select('g')
 		.attr('transform', `translate(${MARGIN.left}, ${MARGIN.top})`)
