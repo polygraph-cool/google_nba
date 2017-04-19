@@ -697,7 +697,7 @@ function setupIntroEvents() {
 		const filter = sel.attr('data-filter')
 		const value = sel.attr('data-value')
 		if (filter === 'player') {
-			d3.select('.search__input input').node().value = value
+			d3.selectAll('.search__input input').node().value = value
 			handleSearchChange.call({ value })
 		} else if (filter === 'play') {
 			const index = +d3.select(this.parentNode).attr('data-index')
