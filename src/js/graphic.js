@@ -62,6 +62,7 @@ function cleanData(row) {
 		agg_view_count: +row.agg_view_count,
 		og_title: row.title,
 		title: row.title_custom || abridge(row.title),
+		external_video_id: row.video_custom || row.external_video_id,
 		date: formatDate(row.date),
 		views: formatViews(row.agg_view_count),
 		decade_display: decadeTitles[row.decade],
@@ -76,11 +77,11 @@ function rollupDecade(values) {
 }
 
 function manual() {
-	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tdecade\n'
+	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tvideo_custom\tdecade\n'
 		
 	window.output += dataFlat.map(d => {
-		const { external_video_id, title_custom, og_title, team, type, start, decade } = d
-		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${decade}\t`
+		const { external_video_id, title_custom, og_title, team, type, start, video_custom, decade } = d
+		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${video_custom}\t${decade}\t`
 		return out
 	})
 	.join('\n')
