@@ -243,6 +243,8 @@ function handlePlayEnter(d) {
 	d3.select(this.parentNode).selectAll('.item')
 		.classed('is-selected', false)
 
+	d3.select(this).classed('is-selected', true)
+
 	displayTitle({ decade, index })
 }
 
