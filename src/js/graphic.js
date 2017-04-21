@@ -652,6 +652,7 @@ function setupKey() {
 	// flatten teams
 	const teams = uniq(d3.merge(dataFlat.map(d => d.teams)))
 		.map(d => d.toUpperCase())
+		.sort(d3.ascending)
 
 	teams.unshift('All')
 
