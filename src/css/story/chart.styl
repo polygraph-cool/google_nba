@@ -15,8 +15,9 @@
 			display block
 	.year__chart
 		position relative
-		margin-bottom 4rem
+		margin-bottom 4.5rem
 		width 100%
+		z-index 0
 		+mq('bp-4')
 			margin-bottom 6rem
 		&.is-hidden-before:before
@@ -203,6 +204,7 @@
 		z-index set-index('overlay')
 		position relative
 		transform translateY(-1.4rem)
+		z-index 1
 
 	.annotation__text
 		width 50%
