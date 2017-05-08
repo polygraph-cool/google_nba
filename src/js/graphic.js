@@ -737,7 +737,7 @@ function setupEmbed() {
 	link.on('click', function() {
 		const el = d3.select(this.parentNode).select('.embed__code')
 		const visible = el.classed('is-visible')
-		link.text(visible ? 'Embed this' : 'Close')
+		d3.select(this).text(visible ? 'Embed this' : 'Close')
 		el.classed('is-visible', !visible)
 	})
 }
