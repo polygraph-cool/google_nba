@@ -8,7 +8,6 @@ import Youtube from './youtube'
 import Text from './text'
 import * as Dom from './utils/dom'
 
-
 let mobile = false
 
 let dataByDecade = null
@@ -467,6 +466,15 @@ function createChart() {
 	year.append('div')
 		.attr('class', 'year__slider')
 		.attr('id', (d, i) => `slider-${i}`)
+
+	year.append('div')
+		.attr('class', 'embed')
+		.html((d, i) => {
+			return `
+			<p class='embed__link'>Embed this</p>
+			<textarea class='embed__code' readonly='true'><div id='google-nba-embed' style='max-width: 640px; margin: 20px auto;'></div><script src='https://pym.nprapps.org/pym.v1.min.js'></script><script>(function(){var url ='https://googletrends.github.io/google_nba/embed?era=${i}';var pymParent=new pym.Parent('google-nba-embed',url,{});})()</script></textarea>
+			`
+		})
 }
 
 function setupScales() {
@@ -723,6 +731,17 @@ function setupDropdown() {
 	select.on('change', handleEraChange)
 }
 
+function setupEmbed() {
+	// const el = d3.selectAll('.embed__code')
+	const link = d3.selectAll('.embed__link')
+	link.on('click', function() {
+		const el = d3.select(this.parentNode).select('.embed__code')
+		const visible = el.classed('is-visible')
+		link.text(visible ? 'Embed this' : 'Close')
+		el.classed('is-visible', !visible)
+	})
+}
+
 function setup() {
 	setupScales()
 	Youtube.setup(dataByDecade)
@@ -734,6 +753,7 @@ function setup() {
 	setupCategories()
 	setupTitles()
 	setupIntroEvents()
+	setupEmbed()
 
 	setupSlider()
 	setupScroll()

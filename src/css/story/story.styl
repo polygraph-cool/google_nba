@@ -63,3 +63,33 @@ p
 	&.is-bottom
 		top auto
 		bottom 0
+	
+.embed
+	max-width $column-width
+	margin 0 auto
+	display block
+	text-align right
+	position relative
+	padding-top 1rem
+	
+	&__link
+		margin-right 1rem
+		text-transform uppercase
+		letter-spacing 0.05em
+		font-size 0.8rem
+		display inline-block
+		border-bottom 1px solid currentColor
+		cursor pointer
+	
+	&__code
+		box-shadow 0 0 5px rgba(0,0,0,0.5)
+		position absolute
+		bottom 1.5rem
+		left 1%
+		width 98%
+		resize none
+		height 6rem
+		display none
+		&.is-visible
+			display block
+			
