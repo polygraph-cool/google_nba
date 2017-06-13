@@ -76,11 +76,11 @@ function rollupDecade(values) {
 }
 
 function manual() {
-	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tvideo_custom\tdecade\n'
+	window.output = 'external_video_id\ttitle_custom\tog_title\tteam\ttype\tstart\tvideo_custom\tdecade\tdate\n'
 		
 	window.output += dataFlat.map(d => {
-		const { external_video_id, title_custom, og_title, team, type, start, video_custom, decade } = d
-		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${video_custom}\t${decade}\t`
+		const { external_video_id, title_custom, og_title, team, type, start, video_custom, decade, date } = d
+		const out = `${external_video_id}\t${title_custom}\t${og_title}\t${team}\t${type}\t${start}\t${video_custom}\t${decade}\t${date}\t`
 		return out
 	})
 	.join('\n')
